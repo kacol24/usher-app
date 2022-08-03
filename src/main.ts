@@ -29,7 +29,7 @@ const app = createApp(App)
     .use(IonicVue)
     .use(router)
     .use(urql, {
-        url: 'http://diundang.test/graphql',
+        url: process.env.VUE_APP_API_URL + '/graphql',
         exchanges: [devtoolsExchange, ...defaultExchanges],
     });
 

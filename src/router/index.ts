@@ -17,7 +17,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: 'guest-list',
-        component: () => import('@/views/Tab1Page.vue')
+        component: () => import('@/views/GuestListTab.vue')
       },
       {
         path: 'dashboard',
