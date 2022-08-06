@@ -4,15 +4,18 @@
       <ion-toolbar>
         <ion-title>Guest List</ion-title>
       </ion-toolbar>
+      <ion-toolbar>
+        <form action="">
+          <ion-searchbar animated
+                         inputmode="search"
+                         show-cancel-button="focus"
+                         show-clear-button="focus"
+                         type="search"
+                         v-model="search"></ion-searchbar>
+        </form>
+      </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Guest List</ion-title>
-        </ion-toolbar>
-      </ion-header>
-
       <ion-refresher slot="fixed" @ionRefresh="doRefresh($event)">
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
@@ -25,8 +28,8 @@
         </ion-item>
       </ion-list>
 
-      <ion-list v-if="data.invitations">
-        <ion-item v-for="invitation in data.invitations.data" :key="invitation.id">
+      <ion-list v-else>
+        <ion-item v-for="invitation in invitations" :key="invitation.id">
           <ion-label>
             {{ invitation.name }}
           </ion-label>
@@ -37,8 +40,8 @@
   </ion-page>
 </template>
 
-<script lang="ts">
-import {defineComponent} from 'vue';
+<script>
+import {computed, defineComponent, onMounted, reactive, ref} from 'vue';
 import {
   IonContent,
   IonHeader,
@@ -46,21 +49,19 @@ import {
   IonLabel,
   IonList,
   IonPage,
-  IonRefresher, IonRefresherContent, IonSkeletonText,
+  IonRefresher,
+  IonRefresherContent,
+  IonSearchbar,
+  IonSkeletonText,
   IonTitle,
   IonToolbar
 } from '@ionic/vue';
-import {gql, useQuery} from "@urql/vue";
+import {gql, useQuery} from '@urql/vue';
 
 const ALL_INVITATIONS_QUERY = gql`
 query GetAllInvitations {
   invitations {
-    paginatorInfo {
-        hasMorePages
-        currentPage
-    }
-    data {
-      guest_code
+    guest_code
       name
       guests
       seating {
@@ -70,7 +71,6 @@ query GetAllInvitations {
         serial_number
         created_at
       }
-    }
   }
 }
 `;
@@ -89,23 +89,47 @@ export default defineComponent({
     IonRefresher,
     IonRefresherContent,
     IonSkeletonText,
+    IonSearchbar
   },
   setup() {
-    const result = useQuery({
-      query: ALL_INVITATIONS_QUERY
+    const search = ref('');
+    const invitations = reactive([]);
+
+    const {fetching, executeQuery, data} = useQuery({
+      query: ALL_INVITATIONS_QUERY,
+      pause: true
     });
 
-    return {
-      data: result.data,
-      isLoading: result.fetching,
-      error: result.error,
-      doRefresh(e: any) {
-        result.executeQuery({
-          requestPolicy: 'network-only',
-        });
-        e.detail.complete();
+    const filteredInvitations = computed(() => {
+      if (!search.value) {
+        return invitations;
       }
+
+      return invitations.filter(invitation => {
+        return invitation.name.toLowerCase().includes(search.value.toLowerCase());
+      });
+    });
+
+    onMounted(async () => {
+      await executeQuery();
+      data.value.invitations.forEach(invitation => {
+        invitations.push(invitation);
+      });
+    });
+
+    function doRefresh(e) {
+      executeQuery({
+        requestPolicy: 'network-only'
+      });
+      e.detail.complete();
     }
+
+    return {
+      invitations: filteredInvitations,
+      search,
+      isLoading: fetching,
+      doRefresh
+    };
   }
 });
 </script>
