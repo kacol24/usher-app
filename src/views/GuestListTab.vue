@@ -2,7 +2,20 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button id="filter-group">
+            Groups
+          </ion-button>
+          <ion-popover trigger="filter-group" trigger-action="click">
+            <ion-content class="ion-padding" scroll-y="false">Hello World!</ion-content>
+          </ion-popover>
+        </ion-buttons>
         <ion-title>Guest List</ion-title>
+        <ion-buttons slot="end">
+          <ion-button>
+            <ion-icon slot="icon-only" :icon="icons.qrCode"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
       <ion-toolbar>
         <form action="">
@@ -42,13 +55,16 @@
 
 <script>
 import {computed, defineComponent, onMounted, reactive, ref} from 'vue';
+import {qrCodeSharp} from 'ionicons/icons';
 import {
+  IonButton,
+  IonButtons,
   IonContent,
-  IonHeader,
+  IonHeader, IonIcon,
   IonItem,
   IonLabel,
   IonList,
-  IonPage,
+  IonPage, IonPopover,
   IonRefresher,
   IonRefresherContent,
   IonSearchbar,
@@ -89,7 +105,11 @@ export default defineComponent({
     IonRefresher,
     IonRefresherContent,
     IonSkeletonText,
-    IonSearchbar
+    IonSearchbar,
+    IonButtons,
+    IonButton,
+    IonIcon,
+    IonPopover,
   },
   setup() {
     const search = ref('');
@@ -125,6 +145,9 @@ export default defineComponent({
     }
 
     return {
+      icons: {
+        qrCode: qrCodeSharp
+      },
       invitations: filteredInvitations,
       search,
       isLoading: fetching,
