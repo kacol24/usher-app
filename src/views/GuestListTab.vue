@@ -42,11 +42,18 @@
       </ion-list>
 
       <ion-list v-else>
-        <ion-item v-for="invitation in invitations" :key="invitation.id" lines="full">
-          <ion-label>
-            {{ invitation.name }}
-          </ion-label>
-        </ion-item>
+        <ion-item-group v-for="invitationRow in invitations" :key="invitationRow.key">
+          <ion-item-divider sticky>
+            <ion-label>
+              {{ invitationRow.key }}
+            </ion-label>
+          </ion-item-divider>
+          <ion-item v-for="invitation in invitationRow.invitations" :key="invitation.id" lines="full">
+            <ion-label>
+              {{ invitation.full_name }}
+            </ion-label>
+          </ion-item>
+        </ion-item-group>
       </ion-list>
 
     </ion-content>
@@ -61,7 +68,7 @@ import {
   IonButtons,
   IonContent,
   IonHeader, IonIcon,
-  IonItem,
+  IonItem, IonItemDivider, IonItemGroup,
   IonLabel,
   IonList,
   IonPage, IonPopover,
@@ -78,15 +85,16 @@ const ALL_INVITATIONS_QUERY = gql`
 query GetAllInvitations {
   invitations {
     guest_code
+    name
+    full_name
+    guests
+    seating {
       name
-      guests
-      seating {
-        name
-      }
-      attendance {
-        serial_number
-        created_at
-      }
+    }
+    attendance {
+      serial_number
+      created_at
+    }
   }
 }
 `;
@@ -110,10 +118,13 @@ export default defineComponent({
     IonButton,
     IonIcon,
     IonPopover,
+    IonItemGroup,
+    IonItemDivider
   },
   setup() {
     const search = ref('');
     const invitations = reactive([]);
+    const rawInvitations = reactive([]);
 
     const {fetching, executeQuery, data} = useQuery({
       query: ALL_INVITATIONS_QUERY,
@@ -125,15 +136,44 @@ export default defineComponent({
         return invitations;
       }
 
-      return invitations.filter(invitation => {
+      let filtered = rawInvitations.filter(invitation => {
         return invitation.name.toLowerCase().includes(search.value.toLowerCase());
       });
+
+      let last = null;
+      let grouped = [];
+      filtered.forEach(invitation => {
+        if (!last || last !== invitation.name[0].toUpperCase()) {
+          last = invitation.name[0].toUpperCase();
+          grouped.push({
+            key: invitation.name[0].toUpperCase(),
+            invitations: []
+          });
+        }
+
+        grouped[grouped.length - 1].invitations.push(invitation);
+      });
+
+      return grouped;
     });
 
     onMounted(async () => {
       await executeQuery();
       data.value.invitations.forEach(invitation => {
-        invitations.push(invitation);
+        rawInvitations.push(invitation);
+      });
+
+      let last = null;
+      rawInvitations.forEach(invitation => {
+        if (!last || last !== invitation.name[0].toUpperCase()) {
+          last = invitation.name[0].toUpperCase();
+          invitations.push({
+            key: invitation.name[0].toUpperCase(),
+            invitations: []
+          });
+        }
+
+        invitations[invitations.length - 1].invitations.push(invitation);
       });
     });
 
