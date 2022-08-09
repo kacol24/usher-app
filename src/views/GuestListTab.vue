@@ -11,25 +11,25 @@
                          show-cancel-button="focus"
                          show-clear-button="focus"
                          type="search"
-                         v-model="search"></ion-searchbar>
+                         v-model="search"/>
         </form>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
       <ion-refresher slot="fixed" @ionRefresh="doRefresh($event)">
-        <ion-refresher-content></ion-refresher-content>
+        <ion-refresher-content/>
       </ion-refresher>
 
       <ion-list v-if="isLoading">
         <ion-item v-for="invitation in Array(10)" :key="invitation">
           <ion-label>
-            <ion-skeleton-text animated></ion-skeleton-text>
+            <ion-skeleton-text animated/>
           </ion-label>
         </ion-item>
       </ion-list>
 
       <ion-list v-else>
-        <ion-item v-for="invitation in invitations" :key="invitation.id">
+        <ion-item v-for="invitation in invitations" :key="invitation.id" lines="full">
           <ion-label>
             {{ invitation.name }}
           </ion-label>
