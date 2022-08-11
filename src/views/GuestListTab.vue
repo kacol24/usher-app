@@ -88,13 +88,11 @@
               </ion-note>
             </ion-label>
             <ion-note slot="end" class="ion-text-right ion-padding-vertical">
-              <small>
-                Table<br>
-                <strong>{{ invitation.seating?.name ?? '-' }}</strong><br>
-                <br>
-                Guest(s)<br>
-                <strong>{{ invitation.pax ?? invitation.guests }}</strong>
-              </small>
+              Table<br>
+              <strong>{{ invitation.seating?.name ?? '-' }}</strong><br>
+              <br>
+              Guest(s)<br>
+              <strong>{{ invitation.pax ?? invitation.guests }}</strong>
             </ion-note>
           </ion-item>
         </ion-item-group>
