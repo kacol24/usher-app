@@ -48,10 +48,34 @@
               {{ invitationRow.key }}
             </ion-label>
           </ion-item-divider>
-          <ion-item v-for="invitation in invitationRow.invitations" :key="invitation.id" lines="full">
-            <ion-label>
-              {{ invitation.full_name }}
+          <ion-item v-for="invitation in invitationRow.invitations" :key="invitation.id">
+            <ion-thumbnail slot="start" style="display: flex;"
+                           class="ion-align-items-center ion-justify-content-center">
+              <span v-if="invitation.attendance">
+                {{ invitation.attendance.serial_number }}
+              </span>
+              <span v-else>
+                -
+              </span>
+            </ion-thumbnail>
+            <ion-label class="ion-text-wrap">
+              [{{ invitation.guest_code }}]
+              <h2>
+                {{ invitation.full_name }}
+              </h2>
+              <ion-note v-if="invitation.group">
+                {{ invitation.group.name }}
+              </ion-note>
             </ion-label>
+            <ion-note slot="end" class="ion-text-right ion-padding-vertical">
+              <small>
+                Table<br>
+                <strong>{{ invitation.seating?.name ?? '-' }}</strong><br>
+                <br>
+                Guest(s)<br>
+                <strong>{{ invitation.pax ?? invitation.guests }}</strong>
+              </small>
+            </ion-note>
           </ion-item>
         </ion-item-group>
       </ion-list>
@@ -70,12 +94,12 @@ import {
   IonHeader, IonIcon,
   IonItem, IonItemDivider, IonItemGroup,
   IonLabel,
-  IonList,
+  IonList, IonNote,
   IonPage, IonPopover,
   IonRefresher,
   IonRefresherContent,
   IonSearchbar,
-  IonSkeletonText,
+  IonSkeletonText, IonThumbnail,
   IonTitle,
   IonToolbar
 } from '@ionic/vue';
@@ -88,6 +112,10 @@ query GetAllInvitations {
     name
     full_name
     guests
+    pax
+    group {
+      name
+    }
     seating {
       name
     }
@@ -119,7 +147,9 @@ export default defineComponent({
     IonIcon,
     IonPopover,
     IonItemGroup,
-    IonItemDivider
+    IonItemDivider,
+    IonThumbnail,
+    IonNote
   },
   setup() {
     const search = ref('');
