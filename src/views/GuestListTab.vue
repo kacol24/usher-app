@@ -34,10 +34,30 @@
       </ion-refresher>
 
       <ion-list v-if="isLoading">
-        <ion-item v-for="invitation in Array(10)" :key="invitation">
-          <ion-label>
-            <ion-skeleton-text animated/>
+        <ion-item-divider sticky>
+          <ion-label style="width: 10%;">
+            <ion-skeleton-text animated style="width: 100%;"/>
           </ion-label>
+        </ion-item-divider>
+        <ion-item v-for="invitation in Array(10)" :key="invitation">
+          <ion-thumbnail slot="start">
+            <ion-skeleton-text animated/>
+          </ion-thumbnail>
+          <ion-label class="ion-text-wrap">
+            <h2>
+              <ion-skeleton-text animated style="width: 35%;"/>
+            </h2>
+            <h3>
+              <ion-skeleton-text animated style="width: 25%;"/>
+            </h3>
+          </ion-label>
+          <ion-note slot="end" style="display: flex;flex-direction: column;align-items: flex-end;" class="ion-padding-vertical">
+            <ion-skeleton-text animated style="width: 50px;"/>
+            <ion-skeleton-text animated style="width: 100px;"/>
+            <br>
+            <ion-skeleton-text animated style="width: 70px;"/>
+            <ion-skeleton-text animated style="width: 50px;"/>
+          </ion-note>
         </ion-item>
       </ion-list>
 
