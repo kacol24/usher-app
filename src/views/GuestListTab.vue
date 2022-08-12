@@ -51,7 +51,8 @@
               <ion-skeleton-text animated style="width: 25%;"/>
             </h3>
           </ion-label>
-          <ion-note slot="end" style="display: flex;flex-direction: column;align-items: flex-end;" class="ion-padding-vertical">
+          <ion-note slot="end" style="display: flex;flex-direction: column;align-items: flex-end;"
+                    class="ion-padding-vertical">
             <ion-skeleton-text animated style="width: 50px;"/>
             <ion-skeleton-text animated style="width: 100px;"/>
             <br>
@@ -103,23 +104,30 @@
 </template>
 
 <script>
-import {computed, defineComponent, onMounted, reactive, ref} from 'vue';
+import {computed, defineComponent, reactive, ref} from 'vue';
 import {qrCodeSharp} from 'ionicons/icons';
 import {
   IonButton,
   IonButtons,
   IonContent,
-  IonHeader, IonIcon,
-  IonItem, IonItemDivider, IonItemGroup,
+  IonHeader,
+  IonIcon,
+  IonItem,
+  IonItemDivider,
+  IonItemGroup,
   IonLabel,
-  IonList, IonNote,
-  IonPage, IonPopover,
+  IonList,
+  IonNote,
+  IonPage,
+  IonPopover,
   IonRefresher,
   IonRefresherContent,
   IonSearchbar,
-  IonSkeletonText, IonThumbnail,
+  IonSkeletonText,
+  IonThumbnail,
   IonTitle,
-  IonToolbar
+  IonToolbar,
+  onIonViewWillEnter
 } from '@ionic/vue';
 import {gql, useQuery} from '@urql/vue';
 
@@ -205,7 +213,7 @@ export default defineComponent({
       return grouped;
     });
 
-    onMounted(async () => {
+    onIonViewWillEnter(async () => {
       await executeQuery();
       data.value.invitations.forEach(invitation => {
         rawInvitations.push(invitation);
