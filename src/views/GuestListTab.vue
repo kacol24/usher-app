@@ -18,7 +18,7 @@
         </ion-buttons>
       </ion-toolbar>
       <ion-toolbar>
-        <form action="">
+        <form>
           <ion-searchbar animated
                          inputmode="search"
                          show-cancel-button="focus"
@@ -129,29 +129,8 @@ import {
   IonToolbar,
   onIonViewWillEnter
 } from '@ionic/vue';
-import {gql, useQuery} from '@urql/vue';
-
-const ALL_INVITATIONS_QUERY = gql`
-query GetAllInvitations {
-  invitations {
-    guest_code
-    name
-    full_name
-    guests
-    pax
-    group {
-      name
-    }
-    seating {
-      name
-    }
-    attendance {
-      serial_number
-      created_at
-    }
-  }
-}
-`;
+import {useQuery} from '@urql/vue';
+import {GROUPED_INVITATIONS_QUERY} from '@/graphql/queries';
 
 export default defineComponent({
   name: 'GuestListTab',
@@ -182,8 +161,8 @@ export default defineComponent({
     const invitations = reactive([]);
     const rawInvitations = reactive([]);
 
-    const {fetching, executeQuery, data} = useQuery({
-      query: ALL_INVITATIONS_QUERY,
+    const {fetching, executeQuery, data: response} = useQuery({
+      query: GROUPED_INVITATIONS_QUERY,
       pause: true
     });
 
@@ -192,44 +171,25 @@ export default defineComponent({
         return invitations;
       }
 
-      let filtered = rawInvitations.filter(invitation => {
-        return invitation.name.toLowerCase().includes(search.value.toLowerCase());
+      let filtered = rawInvitations.map(invitationGroup => {
+        let invitations = invitationGroup.invitations.filter(invitation => {
+          return invitation.name.toLowerCase().includes(search.value.toLowerCase());
+        });
+
+        return {
+          key: invitationGroup.key,
+          invitations: invitations
+        };
       });
 
-      let last = null;
-      let grouped = [];
-      filtered.forEach(invitation => {
-        if (!last || last !== invitation.name[0].toUpperCase()) {
-          last = invitation.name[0].toUpperCase();
-          grouped.push({
-            key: invitation.name[0].toUpperCase(),
-            invitations: []
-          });
-        }
-
-        grouped[grouped.length - 1].invitations.push(invitation);
-      });
-
-      return grouped;
+      return filtered.filter(invitationGroup => invitationGroup.invitations.length);
     });
 
     onIonViewWillEnter(async () => {
       await executeQuery();
-      data.value.invitations.forEach(invitation => {
+      response.value.groupedInvitations.forEach(invitation => {
         rawInvitations.push(invitation);
-      });
-
-      let last = null;
-      rawInvitations.forEach(invitation => {
-        if (!last || last !== invitation.name[0].toUpperCase()) {
-          last = invitation.name[0].toUpperCase();
-          invitations.push({
-            key: invitation.name[0].toUpperCase(),
-            invitations: []
-          });
-        }
-
-        invitations[invitations.length - 1].invitations.push(invitation);
+        invitations.push(invitation);
       });
     });
 
