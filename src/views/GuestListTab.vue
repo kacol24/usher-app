@@ -93,21 +93,33 @@
               </span>
             </ion-thumbnail>
             <ion-label class="ion-text-wrap">
-              [{{ invitation.guest_code }}]
-              <h2>
-                {{ invitation.full_name }}
-              </h2>
-              <ion-note v-if="invitation.group">
-                {{ invitation.group.name }}
-              </ion-note>
+              <div style="display: flex;align-items: center;justify-content: space-between;">
+                <h2>
+                  [{{ invitation.guest_code }}]
+                </h2>
+                <ion-note v-if="invitation.group">
+                  {{ invitation.group.group_name }}
+                </ion-note>
+              </div>
+              <h1 class="ion-padding-vertical">
+                {{ invitation.name }}
+              </h1>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <ion-note>
+                  Table:
+                  <strong>{{ invitation.seating?.name ?? '-' }}</strong><br>
+                </ion-note>
+                <ion-note>
+                  Guests:
+                  <strong>
+                    <span v-if="invitation.is_family">
+                      Family
+                    </span>
+                    ({{ invitation.pax ?? invitation.guests }})
+                  </strong>
+                </ion-note>
+              </div>
             </ion-label>
-            <ion-note slot="end" class="ion-text-right ion-padding-vertical">
-              Table<br>
-              <strong>{{ invitation.seating?.name ?? '-' }}</strong><br>
-              <br>
-              Guest(s)<br>
-              <strong>{{ invitation.pax ?? invitation.guests }}</strong>
-            </ion-note>
           </ion-item>
         </ion-item-group>
       </ion-list>
@@ -127,8 +139,8 @@ import {computed, defineComponent, reactive, ref} from 'vue';
 import {qrCodeSharp} from 'ionicons/icons';
 import {
   IonButton,
-  IonButtons,
-  IonContent, IonFooter,
+  IonButtons, IonCol,
+  IonContent, IonFooter, IonGrid,
   IonHeader,
   IonIcon,
   IonItem,
@@ -140,7 +152,7 @@ import {
   IonPage,
   IonPopover,
   IonRefresher,
-  IonRefresherContent,
+  IonRefresherContent, IonRow,
   IonSearchbar, IonSegment, IonSegmentButton,
   IonSkeletonText,
   IonThumbnail,

@@ -32,6 +32,10 @@ export const GROUPED_INVITATIONS_QUERY = gql`
                 full_name
                 guests
                 pax
+                is_family
+                group {
+                    group_name
+                }
                 seating {
                     name
                 }
