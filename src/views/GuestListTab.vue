@@ -93,7 +93,7 @@
                 -
               </span>
             </ion-thumbnail>
-            <ion-label>
+            <ion-label class="ion-padding-vertical">
               <div style="display: flex;align-items: center;justify-content: space-between;">
                 <h2>
                   [{{ invitation.guest_code }}]
@@ -136,12 +136,13 @@
 </template>
 
 <script>
-import {computed, defineComponent, reactive, ref} from 'vue';
+import {computed, defineComponent, inject, ref} from 'vue';
 import {qrCodeSharp} from 'ionicons/icons';
 import {
   IonButton,
-  IonButtons, IonCol,
-  IonContent, IonFooter, IonGrid,
+  IonButtons,
+  IonContent,
+  IonFooter,
   IonHeader,
   IonIcon,
   IonItem,
@@ -153,8 +154,10 @@ import {
   IonPage,
   IonPopover,
   IonRefresher,
-  IonRefresherContent, IonRow,
-  IonSearchbar, IonSegment, IonSegmentButton,
+  IonRefresherContent,
+  IonSearchbar,
+  IonSegment,
+  IonSegmentButton,
   IonSkeletonText,
   IonThumbnail,
   IonTitle,
@@ -192,9 +195,10 @@ export default defineComponent({
     IonFooter
   },
   setup() {
+    const store = inject('store');
+
     const search = ref('');
-    const invitations = reactive([]);
-    const rawInvitations = reactive([]);
+    const invitations = store.state.invitations;
 
     const {fetching, executeQuery, data: response} = useQuery({
       query: GROUPED_INVITATIONS_QUERY,
@@ -206,7 +210,7 @@ export default defineComponent({
         return invitations;
       }
 
-      let filtered = rawInvitations.map(invitationGroup => {
+      let filtered = invitations.map(invitationGroup => {
         let invitations = invitationGroup.invitations.filter(invitation => {
           return invitation.name.toLowerCase().includes(search.value.toLowerCase()) ||
               invitation.guest_code.toLowerCase().includes(search.value.toLowerCase());
@@ -224,8 +228,7 @@ export default defineComponent({
     onIonViewWillEnter(async () => {
       await executeQuery();
       response.value.groupedInvitations.forEach(invitation => {
-        rawInvitations.push(invitation);
-        invitations.push(invitation);
+        store.state.invitations.push(invitation);
       });
     });
 
