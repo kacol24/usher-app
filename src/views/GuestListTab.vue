@@ -7,7 +7,7 @@
             Groups
           </ion-button>
           <ion-popover trigger="filter-group" trigger-action="click">
-            <ion-content class="ion-padding" scroll-y="false">Hello World!</ion-content>
+            <ion-content class="ion-padding" :scroll-y="false">Hello World!</ion-content>
           </ion-popover>
         </ion-buttons>
         <ion-title>Guest List</ion-title>
@@ -26,6 +26,19 @@
                          type="search"
                          v-model="search"/>
         </form>
+      </ion-toolbar>
+      <ion-toolbar>
+        <ion-segment value="all">
+          <ion-segment-button value="all">
+            <ion-label class="ion-padding-horizontal">All</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="checked_in">
+            <ion-label class="ion-padding-horizontal">Checked-in</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="not_checked">
+            <ion-label class="ion-padding-horizontal">Not Checked-in</ion-label>
+          </ion-segment-button>
+        </ion-segment>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
@@ -64,7 +77,7 @@
 
       <ion-list v-else>
         <ion-item-group v-for="invitationRow in invitations" :key="invitationRow.key">
-          <ion-item-divider sticky>
+          <ion-item-divider sticky color="light">
             <ion-label>
               {{ invitationRow.key }}
             </ion-label>
@@ -98,8 +111,14 @@
           </ion-item>
         </ion-item-group>
       </ion-list>
-
     </ion-content>
+    <ion-footer>
+      <ion-toolbar>
+        <ion-button expand="block" color="primary" class="ion-padding-horizontal">
+          Scan
+        </ion-button>
+      </ion-toolbar>
+    </ion-footer>
   </ion-page>
 </template>
 
@@ -109,7 +128,7 @@ import {qrCodeSharp} from 'ionicons/icons';
 import {
   IonButton,
   IonButtons,
-  IonContent,
+  IonContent, IonFooter,
   IonHeader,
   IonIcon,
   IonItem,
@@ -122,7 +141,7 @@ import {
   IonPopover,
   IonRefresher,
   IonRefresherContent,
-  IonSearchbar,
+  IonSearchbar, IonSegment, IonSegmentButton,
   IonSkeletonText,
   IonThumbnail,
   IonTitle,
@@ -154,7 +173,10 @@ export default defineComponent({
     IonItemGroup,
     IonItemDivider,
     IonThumbnail,
-    IonNote
+    IonNote,
+    IonSegment,
+    IonSegmentButton,
+    IonFooter
   },
   setup() {
     const search = ref('');
