@@ -83,7 +83,7 @@
             </ion-label>
           </ion-item-divider>
           <ion-item v-for="invitation in invitationRow.invitations" :key="invitation.id" button
-                    @click="showInvitation(invitation.guest_code)">
+                    @click="showInvitation(invitation)">
             <ion-thumbnail slot="start" class="ion-align-items-center ion-justify-content-center"
                            style="display: flex;">
               <span v-if="invitation.attendance">
@@ -128,7 +128,7 @@
     <ion-footer>
       <ion-toolbar>
         <ion-button expand="block" color="primary" class="ion-padding-horizontal">
-          Scan
+          SCAN
         </ion-button>
       </ion-toolbar>
     </ion-footer>
@@ -162,7 +162,7 @@ import {
   IonThumbnail,
   IonTitle,
   IonToolbar,
-  onIonViewWillEnter
+  onIonViewWillEnter, useIonRouter
 } from '@ionic/vue';
 import {useQuery} from '@urql/vue';
 import {GROUPED_INVITATIONS_QUERY} from '@/graphql/queries';
@@ -196,6 +196,7 @@ export default defineComponent({
   },
   setup() {
     const store = inject('store');
+    const ionRouter = useIonRouter();
 
     const search = ref('');
     const invitations = store.state.invitations;
@@ -240,7 +241,7 @@ export default defineComponent({
     }
 
     function showInvitation(invitation) {
-      console.log(invitation);
+      ionRouter.push({name: 'invitations.show', params: {guest_code: invitation.guest_code}});
     }
 
     return {
