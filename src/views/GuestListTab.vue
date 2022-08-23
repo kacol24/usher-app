@@ -82,9 +82,10 @@
               {{ invitationRow.key }}
             </ion-label>
           </ion-item-divider>
-          <ion-item v-for="invitation in invitationRow.invitations" :key="invitation.id">
-            <ion-thumbnail slot="start" style="display: flex;"
-                           class="ion-align-items-center ion-justify-content-center">
+          <ion-item v-for="invitation in invitationRow.invitations" :key="invitation.id" button
+                    @click="showInvitation(invitation.guest_code)">
+            <ion-thumbnail slot="start" class="ion-align-items-center ion-justify-content-center"
+                           style="display: flex;">
               <span v-if="invitation.attendance">
                 {{ invitation.attendance.serial_number }}
               </span>
@@ -92,7 +93,7 @@
                 -
               </span>
             </ion-thumbnail>
-            <ion-label class="ion-text-wrap">
+            <ion-label>
               <div style="display: flex;align-items: center;justify-content: space-between;">
                 <h2>
                   [{{ invitation.guest_code }}]
@@ -101,7 +102,7 @@
                   {{ invitation.group.group_name }}
                 </ion-note>
               </div>
-              <h1 class="ion-padding-vertical">
+              <h1 class="ion-padding-vertical ion-text-wrap">
                 {{ invitation.name }}
               </h1>
               <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -207,7 +208,8 @@ export default defineComponent({
 
       let filtered = rawInvitations.map(invitationGroup => {
         let invitations = invitationGroup.invitations.filter(invitation => {
-          return invitation.name.toLowerCase().includes(search.value.toLowerCase());
+          return invitation.name.toLowerCase().includes(search.value.toLowerCase()) ||
+              invitation.guest_code.toLowerCase().includes(search.value.toLowerCase());
         });
 
         return {
@@ -234,6 +236,10 @@ export default defineComponent({
       e.detail.complete();
     }
 
+    function showInvitation(invitation) {
+      console.log(invitation);
+    }
+
     return {
       icons: {
         qrCode: qrCodeSharp
@@ -241,7 +247,8 @@ export default defineComponent({
       invitations: filteredInvitations,
       search,
       isLoading: fetching,
-      doRefresh
+      doRefresh,
+      showInvitation
     };
   }
 });
