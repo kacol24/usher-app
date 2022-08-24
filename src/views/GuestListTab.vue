@@ -46,7 +46,7 @@
         <ion-refresher-content/>
       </ion-refresher>
 
-      <ion-list v-if="isLoading">
+      <ion-list v-if="store.state.isLoading">
         <ion-item-divider sticky>
           <ion-label style="width: 10%;">
             <ion-skeleton-text animated style="width: 100%;"/>
@@ -162,10 +162,11 @@ import {
   IonThumbnail,
   IonTitle,
   IonToolbar,
-  onIonViewWillEnter, useIonRouter
+  useIonRouter
 } from '@ionic/vue';
 import {useQuery} from '@urql/vue';
 import {GROUPED_INVITATIONS_QUERY} from '@/graphql/queries';
+import store from '@/store';
 
 export default defineComponent({
   name: 'GuestListTab',
@@ -199,19 +200,13 @@ export default defineComponent({
     const ionRouter = useIonRouter();
 
     const search = ref('');
-    const invitations = store.state.invitations;
-
-    const {fetching, executeQuery, data: response} = useQuery({
-      query: GROUPED_INVITATIONS_QUERY,
-      pause: true
-    });
 
     const filteredInvitations = computed(() => {
       if (!search.value) {
-        return invitations;
+        return store.state.invitations;
       }
 
-      let filtered = invitations.map(invitationGroup => {
+      let filtered = store.state.invitations.map(invitationGroup => {
         let invitations = invitationGroup.invitations.filter(invitation => {
           return invitation.name.toLowerCase().includes(search.value.toLowerCase()) ||
               invitation.guest_code.toLowerCase().includes(search.value.toLowerCase());
@@ -226,18 +221,23 @@ export default defineComponent({
       return filtered.filter(invitationGroup => invitationGroup.invitations.length);
     });
 
-    onIonViewWillEnter(async () => {
-      await executeQuery();
+    const {executeQuery, data: response} = useQuery({
+      query: GROUPED_INVITATIONS_QUERY
+    });
+
+    async function doRefresh(e) {
+      store.state.isLoading = true;
+      e.detail.complete();
+
+      await executeQuery({
+        requestPolicy: 'network-only'
+      });
+      store.state.invitations = [];
       response.value.groupedInvitations.forEach(invitation => {
         store.state.invitations.push(invitation);
       });
-    });
 
-    function doRefresh(e) {
-      executeQuery({
-        requestPolicy: 'network-only'
-      });
-      e.detail.complete();
+      store.state.isLoading = false;
     }
 
     function showInvitation(invitation) {
@@ -250,9 +250,9 @@ export default defineComponent({
       },
       invitations: filteredInvitations,
       search,
-      isLoading: fetching,
       doRefresh,
-      showInvitation
+      showInvitation,
+      store
     };
   }
 });

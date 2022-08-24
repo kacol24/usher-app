@@ -32,27 +32,23 @@
           :is-open="isLoading"/>
     </ion-content>
     <ion-footer>
-      <div class="ion-text-center">
-        <h2 style="font-size: 52px;">
-          A001
-          <ion-text color="medium">
-            <small style="display: block; font-size: 16px">
-              (18:12:34)
-            </small>
-          </ion-text>
-        </h2>
-      </div>
+      <ion-toolbar style="min-height: 120px;">
+        <div class="ion-text-center">
+          <h2 style="font-size: 52px;" class="ion-margin-vertical">
+            A001
+            <ion-text color="medium">
+              <small style="display: block; font-size: 16px">
+                (18:12:34)
+              </small>
+            </ion-text>
+          </h2>
+        </div>
+      </ion-toolbar>
       <ion-item-sliding ref="itemSliding" class="ion-color-success" style="background-color: var(--ion-color-base)">
-        <ion-item-options side="start" @ionSwipe="handleCheckIn">
-          <ion-item-option expandable color="success"
-                           @click="handleCheckIn">
-            Confirm Check In
-          </ion-item-option>
-        </ion-item-options>
-
+        <ion-item-options side="start" @ionSwipe="handleCheckIn"/>
         <ion-item color="primary">
           <ion-icon :icon="icons.arrowForwardCircle" slot="start"></ion-icon>
-          <ion-label>
+          <ion-label class="ion-padding-vertical">
             Swipe to Check In
           </ion-label>
         </ion-item>
@@ -97,7 +93,6 @@ export default defineComponent({
     IonText,
     IonItemSliding,
     IonItemOptions,
-    IonItemOption,
     IonItem,
     IonLabel,
     IonIcon,

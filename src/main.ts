@@ -1,8 +1,7 @@
 import {createApp} from 'vue'
 import App from './App.vue'
 import router from './router';
-import urql, {defaultExchanges} from '@urql/vue';
-import {devtoolsExchange} from "@urql/devtools";
+import urql from '@urql/vue';
 
 import {IonicVue} from '@ionic/vue';
 
@@ -29,8 +28,7 @@ const app = createApp(App)
     .use(IonicVue)
     .use(router)
     .use(urql, {
-        url: process.env.VUE_APP_API_URL + '/graphql',
-        exchanges: [devtoolsExchange, ...defaultExchanges],
+        url: process.env.VUE_APP_API_URL + '/graphql'
     });
 
 router.isReady().then(() => {
