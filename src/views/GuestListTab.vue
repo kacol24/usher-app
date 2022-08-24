@@ -82,52 +82,66 @@
               {{ invitationRow.key }}
             </ion-label>
           </ion-item-divider>
-          <ion-item v-for="invitation in invitationRow.invitations" :key="invitation.id" button
-                    @click="showInvitation(invitation)">
-            <ion-thumbnail slot="start" class="ion-align-items-center ion-justify-content-center"
-                           style="display: flex;">
-              <span v-if="invitation.attendance">
-                {{ invitation.attendance.serial_number }}
-              </span>
-              <span v-else>
-                -
-              </span>
-            </ion-thumbnail>
-            <ion-label class="ion-padding-vertical">
-              <div style="display: flex;align-items: center;justify-content: space-between;">
-                <h3>
-                  [{{ invitation.guest_code }}]
-                </h3>
-                <ion-note v-if="invitation.group">
-                  <h3>
-                    {{ invitation.group.group_name }}
-                  </h3>
-                </ion-note>
-              </div>
-              <h2 class="ion-text-wrap ion-padding-vertical" style="margin: 0;">
-                {{ invitation.name }}
-              </h2>
-              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 80%;">
-                <ion-note>
-                  <h3>
-                    Table:
-                    <strong>{{ invitation.seating?.name ?? '-' }}</strong><br>
-                  </h3>
-                </ion-note>
-                <ion-note>
-                  <h3>
-                    Guests:
-                    <strong>
-                    <span v-if="invitation.is_family">
-                      Family
+          <DynamicScroller class="scroller ion-content-scroll-host"
+                           :min-item-size="143"
+                           :items="invitationRow.invitations"
+                           key-field="guest_code"
+          >
+            <template v-slot="{ item, index, active }">
+              <DynamicScrollerItem
+                  :item="item"
+                  :active="active"
+                  :size-dependencies="[item.name]"
+                  :data-index="index"
+              >
+                <ion-item button @click="showInvitation(item)">
+                  <ion-thumbnail slot="start" class="ion-align-items-center ion-justify-content-center"
+                                 style="display: flex;">
+                    <span v-if="item.attendance">
+                      {{ item.attendance.serial_number }}
                     </span>
-                      ({{ invitation.pax ?? invitation.guests }})
-                    </strong>
-                  </h3>
-                </ion-note>
-              </div>
-            </ion-label>
-          </ion-item>
+                    <span v-else>
+                      -
+                    </span>
+                  </ion-thumbnail>
+                  <ion-label class="ion-padding-vertical">
+                    <div style="display: flex;align-items: center;justify-content: space-between;">
+                      <h3>
+                        [{{ item.guest_code }}]
+                      </h3>
+                      <ion-note v-if="item.group">
+                        <h3>
+                          {{ item.group.group_name }}
+                        </h3>
+                      </ion-note>
+                    </div>
+                    <h2 class="ion-text-wrap ion-padding-vertical" style="margin: 0;">
+                      {{ item.name }}
+                    </h2>
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 80%;">
+                      <ion-note>
+                        <h3>
+                          Table:
+                          <strong>{{ item.seating?.name ?? '-' }}</strong><br>
+                        </h3>
+                      </ion-note>
+                      <ion-note>
+                        <h3>
+                          Guests:
+                          <strong>
+                            <span v-if="item.is_family">
+                              Family
+                            </span>
+                            ({{ item.pax ?? item.guests }})
+                          </strong>
+                        </h3>
+                      </ion-note>
+                    </div>
+                  </ion-label>
+                </ion-item>
+              </DynamicScrollerItem>
+            </template>
+          </DynamicScroller>
         </ion-item-group>
       </ion-list>
     </ion-content>
@@ -140,6 +154,12 @@
     </ion-footer>
   </ion-page>
 </template>
+
+<style>
+.scroller {
+  height: 100%;
+}
+</style>
 
 <script>
 import {computed, defineComponent, inject, ref} from 'vue';

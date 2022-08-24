@@ -1,5 +1,5 @@
-import {createApp} from 'vue'
-import App from './App.vue'
+import {createApp} from 'vue';
+import App from './App.vue';
 import router from './router';
 import urql from '@urql/vue';
 
@@ -24,13 +24,20 @@ import '@ionic/vue/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
+
+import {DynamicScroller, DynamicScrollerItem} from "vue-virtual-scroller";
+
 const app = createApp(App)
     .use(IonicVue)
     .use(router)
     .use(urql, {
-        url: process.env.VUE_APP_API_URL + '/graphql'
+      url: process.env.VUE_APP_API_URL + '/graphql'
     });
 
+app.component('DynamicScroller', DynamicScroller);
+app.component('DynamicScrollerItem', DynamicScrollerItem);
+
 router.isReady().then(() => {
-    app.mount('#app');
+  app.mount('#app');
 });
