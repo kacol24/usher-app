@@ -95,29 +95,35 @@
             </ion-thumbnail>
             <ion-label class="ion-padding-vertical">
               <div style="display: flex;align-items: center;justify-content: space-between;">
-                <h2>
+                <h3>
                   [{{ invitation.guest_code }}]
-                </h2>
+                </h3>
                 <ion-note v-if="invitation.group">
-                  {{ invitation.group.group_name }}
+                  <h3>
+                    {{ invitation.group.group_name }}
+                  </h3>
                 </ion-note>
               </div>
-              <h1 class="ion-padding-vertical ion-text-wrap">
+              <h2 class="ion-text-wrap ion-padding-vertical" style="margin: 0;">
                 {{ invitation.name }}
-              </h1>
-              <div style="display: flex; align-items: center; justify-content: space-between;">
+              </h2>
+              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 80%;">
                 <ion-note>
-                  Table:
-                  <strong>{{ invitation.seating?.name ?? '-' }}</strong><br>
+                  <h3>
+                    Table:
+                    <strong>{{ invitation.seating?.name ?? '-' }}</strong><br>
+                  </h3>
                 </ion-note>
                 <ion-note>
-                  Guests:
-                  <strong>
+                  <h3>
+                    Guests:
+                    <strong>
                     <span v-if="invitation.is_family">
                       Family
                     </span>
-                    ({{ invitation.pax ?? invitation.guests }})
-                  </strong>
+                      ({{ invitation.pax ?? invitation.guests }})
+                    </strong>
+                  </h3>
                 </ion-note>
               </div>
             </ion-label>
