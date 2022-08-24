@@ -44,17 +44,12 @@
           </h2>
         </div>
       </ion-toolbar>
-      <ion-toolbar>
-        <ion-button expand="block" color="primary" class="ion-padding-horizontal"
-                    @click="handleCheckIn"
-                    v-show="confirmCheckIn < 1">
-          CHECK IN
-        </ion-button>
-        <ion-button expand="block" color="success" class="ion-padding-horizontal btn-progress"
+      <ion-toolbar class="ion-padding-vertical" style="padding-bottom: 16px;">
+        <ion-button expand="block" :color="checkInButton[confirmCheckIn].color"
+                    class="ion-padding-horizontal"
                     ref="btnProgress"
-                    @click="handleCheckIn"
-                    v-show="confirmCheckIn === 1">
-          CONFIRM CHECK IN
+                    @click="handleCheckIn">
+          {{ checkInButton[confirmCheckIn].text }}
         </ion-button>
       </ion-toolbar>
     </ion-footer>
@@ -72,7 +67,7 @@
   height: 100%;
   background-color: var(--ion-color-success-shade);
   transform: scaleX(1);
-  transition: transform 2s linear;
+  transition: transform 3s linear;
   transform-origin: center left;
 }
 
@@ -118,6 +113,16 @@ export default defineComponent({
   setup() {
     const store = inject('store');
     const btnProgress = ref();
+    const checkInButton = ref([
+      {
+        color: 'primary',
+        text: 'CHECK IN'
+      },
+      {
+        color: 'success',
+        text: 'CONFIRM CHECK IN'
+      }
+    ]);
 
     const confirmCheckIn = ref(0);
     store.state.isLoading = false;
@@ -125,18 +130,20 @@ export default defineComponent({
     async function handleCheckIn() {
       confirmCheckIn.value++;
 
+      btnProgress.value.$el.classList.add('btn-progress');
       setTimeout(() => {
         btnProgress.value.$el.classList.add('btn-progress--start');
       }, 1);
 
       if (confirmCheckIn.value < 2) {
         setTimeout(() => {
+          btnProgress.value.$el.classList.remove('btn-progress', 'btn-progress--start');
           confirmCheckIn.value = 0;
-          btnProgress.value.$el.classList.remove('btn-progress--start');
-        }, 2000);
+        }, 3000);
       } else {
         store.state.isLoading = true;
         confirmCheckIn.value = 0;
+        btnProgress.value.$el.classList.remove('btn-progress', 'btn-progress--start');
         setTimeout(() => store.state.isLoading = false, 1000);
       }
     }
@@ -150,7 +157,8 @@ export default defineComponent({
       store,
       confirmCheckIn,
 
-      btnProgress
+      btnProgress,
+      checkInButton
     };
   }
 });

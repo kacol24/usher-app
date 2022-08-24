@@ -28,9 +28,7 @@ export default defineComponent({
     onMounted(async () => {
       if (!store.state.invitations.length) {
         await executeQuery();
-        response.value.groupedInvitations.forEach(invitation => {
-          store.state.invitations.push(invitation);
-        });
+        store.state.invitations = response.value.groupedInvitations;
       }
       store.state.isLoading = false;
     });

@@ -126,7 +126,7 @@
       </ion-list>
     </ion-content>
     <ion-footer>
-      <ion-toolbar>
+      <ion-toolbar class="ion-padding-vertical" style="padding-bottom: 16px;">
         <ion-button expand="block" color="primary" class="ion-padding-horizontal">
           SCAN
         </ion-button>
