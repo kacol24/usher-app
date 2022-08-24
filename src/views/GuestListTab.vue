@@ -46,7 +46,7 @@
         <ion-refresher-content/>
       </ion-refresher>
 
-      <ion-list v-if="store.state.isLoading">
+      <ion-list v-if="state.isLoading">
         <ion-item-divider sticky>
           <ion-label style="width: 10%;">
             <ion-skeleton-text animated style="width: 100%;"/>
@@ -166,7 +166,6 @@ import {
 } from '@ionic/vue';
 import {useQuery} from '@urql/vue';
 import {GROUPED_INVITATIONS_QUERY} from '@/graphql/queries';
-import store from '@/store';
 
 export default defineComponent({
   name: 'GuestListTab',
@@ -196,17 +195,17 @@ export default defineComponent({
     IonFooter
   },
   setup() {
-    const store = inject('store');
+    const {state} = inject('store');
     const ionRouter = useIonRouter();
 
     const search = ref('');
 
     const filteredInvitations = computed(() => {
       if (!search.value) {
-        return store.state.invitations;
+        return state.invitations;
       }
 
-      let filtered = store.state.invitations.map(invitationGroup => {
+      let filtered = state.invitations.map(invitationGroup => {
         let invitations = invitationGroup.invitations.filter(invitation => {
           return invitation.name.toLowerCase().includes(search.value.toLowerCase()) ||
               invitation.guest_code.toLowerCase().includes(search.value.toLowerCase());
@@ -226,18 +225,18 @@ export default defineComponent({
     });
 
     async function doRefresh(e) {
-      store.state.isLoading = true;
+      state.isLoading = true;
       e.detail.complete();
 
       await executeQuery({
         requestPolicy: 'network-only'
       });
-      store.state.invitations = [];
+      state.invitations = [];
       response.value.groupedInvitations.forEach(invitation => {
-        store.state.invitations.push(invitation);
+        state.invitations.push(invitation);
       });
 
-      store.state.isLoading = false;
+      state.isLoading = false;
     }
 
     function showInvitation(invitation) {
@@ -252,7 +251,7 @@ export default defineComponent({
       search,
       doRefresh,
       showInvitation,
-      store
+      state
     };
   }
 });

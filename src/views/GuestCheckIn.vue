@@ -29,7 +29,7 @@
         </div>
       </div>
       <ion-loading
-          :is-open="isLoading"/>
+          :is-open="store.state.isLoading"/>
     </ion-content>
     <ion-footer>
       <ion-toolbar style="min-height: 120px;">
@@ -44,33 +44,53 @@
           </h2>
         </div>
       </ion-toolbar>
-      <ion-item-sliding ref="itemSliding" class="ion-color-success" style="background-color: var(--ion-color-base)">
-        <ion-item-options side="start" @ionSwipe="handleCheckIn"/>
-        <ion-item color="primary">
-          <ion-icon :icon="icons.arrowForwardCircle" slot="start"></ion-icon>
-          <ion-label class="ion-padding-vertical">
-            Swipe to Check In
-          </ion-label>
-        </ion-item>
-      </ion-item-sliding>
+      <ion-toolbar>
+        <ion-button expand="block" color="primary" class="ion-padding-horizontal"
+                    @click="handleCheckIn"
+                    v-show="confirmCheckIn < 1">
+          CHECK IN
+        </ion-button>
+        <ion-button expand="block" color="success" class="ion-padding-horizontal btn-progress"
+                    ref="btnProgress"
+                    @click="handleCheckIn"
+                    v-show="confirmCheckIn === 1">
+          CONFIRM CHECK IN
+        </ion-button>
+      </ion-toolbar>
     </ion-footer>
   </ion-page>
 </template>
 
+<style>
+.btn-progress::part(native):before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--ion-color-success-shade);
+  transform: scaleX(1);
+  transition: transform 2s linear;
+  transform-origin: center left;
+}
+
+.btn-progress--start::part(native):before {
+  transform: scaleX(0);
+}
+</style>
+
 <script>
-import {defineComponent, ref} from 'vue';
+import {defineComponent, inject, ref} from 'vue';
 import {
   IonBackButton,
+  IonButton,
   IonButtons,
   IonContent,
   IonFooter,
   IonHeader,
-  IonIcon,
-  IonItem,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
-  IonLabel, IonLoading,
+  IonLoading,
   IonPage,
   IonText,
   IonTitle,
@@ -91,22 +111,34 @@ export default defineComponent({
     IonBackButton,
     IonFooter,
     IonText,
-    IonItemSliding,
-    IonItemOptions,
-    IonItem,
-    IonLabel,
-    IonIcon,
-    IonLoading
+    IonLoading,
+    IonButton
   },
 
   setup() {
-    const itemSliding = ref();
-    const isLoading = ref(false);
+    const store = inject('store');
+    const btnProgress = ref();
 
-    function handleCheckIn() {
-      isLoading.value = true;
-      itemSliding.value.$el.closeOpened();
-      setTimeout(() => isLoading.value = false, 1000);
+    const confirmCheckIn = ref(0);
+    store.state.isLoading = false;
+
+    async function handleCheckIn() {
+      confirmCheckIn.value++;
+
+      setTimeout(() => {
+        btnProgress.value.$el.classList.add('btn-progress--start');
+      }, 1);
+
+      if (confirmCheckIn.value < 2) {
+        setTimeout(() => {
+          confirmCheckIn.value = 0;
+          btnProgress.value.$el.classList.remove('btn-progress--start');
+        }, 2000);
+      } else {
+        store.state.isLoading = true;
+        confirmCheckIn.value = 0;
+        setTimeout(() => store.state.isLoading = false, 1000);
+      }
     }
 
     return {
@@ -115,9 +147,10 @@ export default defineComponent({
       },
 
       handleCheckIn,
+      store,
+      confirmCheckIn,
 
-      itemSliding,
-      isLoading
+      btnProgress
     };
   }
 });
