@@ -147,7 +147,7 @@
     </ion-content>
     <ion-footer>
       <ion-toolbar class="ion-padding-vertical" style="padding-bottom: 16px;">
-        <ion-button expand="block" color="primary" class="ion-padding-horizontal">
+        <ion-button expand="block" color="primary" class="ion-padding-horizontal" size="large" mode="ios">
           SCAN
         </ion-button>
       </ion-toolbar>

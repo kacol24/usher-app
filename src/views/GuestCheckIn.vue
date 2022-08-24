@@ -48,6 +48,7 @@
         <ion-button expand="block" :color="checkInButton[confirmCheckIn].color"
                     class="ion-padding-horizontal"
                     ref="btnProgress"
+                    size="large" mode="ios"
                     @click="handleCheckIn">
           {{ checkInButton[confirmCheckIn].text }}
         </ion-button>
