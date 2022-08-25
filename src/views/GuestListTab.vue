@@ -27,19 +27,6 @@
                          v-model="search"/>
         </form>
       </ion-toolbar>
-      <ion-toolbar>
-        <ion-segment value="all">
-          <ion-segment-button value="all">
-            <ion-label class="ion-padding-horizontal">All</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="checked_in">
-            <ion-label class="ion-padding-horizontal">Checked-in</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="not_checked">
-            <ion-label class="ion-padding-horizontal">Not Checked-in</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-      </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
       <ion-refresher slot="fixed" @ionRefresh="doRefresh($event)">
@@ -154,7 +141,7 @@
           <ion-header>
             <ion-toolbar>
               <ion-title>
-                {{ invitationModal.invitation.name }}
+                Invitation Detail
               </ion-title>
               <ion-buttons slot="end">
                 <ion-button @click="invitationModal.setOpen(false)">Close</ion-button>
@@ -190,25 +177,24 @@
             </div>
           </ion-content>
           <ion-footer>
-            <ion-toolbar style="min-height: 120px;">
+            <ion-toolbar style="min-height: 110px;">
               <div class="ion-text-center"
                    v-if="invitationModal.invitation.attendance">
-                <h2 style="font-size: 52px;" class="ion-margin-vertical">
+                <h1 class="ion-margin-vertical" style="font-size: 39px">
                   {{ invitationModal.invitation.attendance?.serial_number }}
                   <ion-text color="medium">
                     <small style="display: block; font-size: 16px">
                       ({{ invitationModal.invitation.attendance?.checkin_time }})
                     </small>
                   </ion-text>
-                </h2>
+                </h1>
               </div>
             </ion-toolbar>
-            <ion-toolbar style="padding-bottom: 16px;">
+            <ion-toolbar>
               <ion-button expand="block" :color="checkInButton[confirmCheckIn].color"
                           class="ion-padding-horizontal btn-progress"
                           :class="{ 'btn-progress--start': confirmCheckIn === 1 }"
-                          ref="btnProgress"
-                          size="large" mode="ios"
+                          ref="btnProgress" mode="ios"
                           @click="handleCheckIn">
                 {{ checkInButton[confirmCheckIn].text }}
               </ion-button>
@@ -218,13 +204,6 @@
       </ion-modal>
       <ion-loading :is-open="invitationModal.isLoading"/>
     </ion-content>
-    <ion-footer>
-      <ion-toolbar class="ion-padding-vertical" style="padding-bottom: 16px;">
-        <ion-button expand="block" color="primary" class="ion-padding-horizontal" size="large" mode="ios">
-          SCAN
-        </ion-button>
-      </ion-toolbar>
-    </ion-footer>
   </ion-page>
 </template>
 
@@ -266,7 +245,8 @@ import {
   IonItemDivider,
   IonItemGroup,
   IonLabel,
-  IonList, IonLoading,
+  IonList,
+  IonLoading,
   IonModal,
   IonNote,
   IonPage,
@@ -274,8 +254,6 @@ import {
   IonRefresher,
   IonRefresherContent,
   IonSearchbar,
-  IonSegment,
-  IonSegmentButton,
   IonSkeletonText,
   IonText,
   IonThumbnail,
@@ -308,8 +286,6 @@ export default defineComponent({
     IonItemDivider,
     IonThumbnail,
     IonNote,
-    IonSegment,
-    IonSegmentButton,
     IonFooter,
     IonModal,
     IonText,
@@ -359,13 +335,14 @@ export default defineComponent({
         clearTimeout(confirmTimer);
         confirmCheckIn.value = 0;
         invitationModal.isLoading = true;
-        setTimeout(() => {
-          invitationModal.invitation.attendance = {
-            serial_number: 'A001',
-            checkin_time: '12:34:56'
-          };
-          invitationModal.isLoading = false;
-        }, 1000);
+
+        await fetchInvitations();
+
+        invitationModal.isLoading = false;
+        invitationModal.invitation.attendance = {
+          serial_number: 'A001',
+          checkin_time: '12:34:56'
+        };
       }
     }
 
@@ -397,6 +374,12 @@ export default defineComponent({
       state.isLoading = true;
       e.detail.complete();
 
+      await fetchInvitations();
+
+      state.isLoading = false;
+    }
+
+    async function fetchInvitations() {
       await executeQuery({
         requestPolicy: 'network-only'
       });
@@ -404,8 +387,6 @@ export default defineComponent({
       response.value.groupedInvitations.forEach(invitation => {
         state.invitations.push(invitation);
       });
-
-      state.isLoading = false;
     }
 
     function showInvitation(invitation) {
