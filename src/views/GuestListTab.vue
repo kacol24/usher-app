@@ -144,6 +144,72 @@
           </DynamicScroller>
         </ion-item-group>
       </ion-list>
+
+      <ion-modal :is-open="invitationModal.isOpen">
+        <ion-page>
+          <ion-header>
+            <ion-toolbar>
+              <ion-title>
+                {{ invitationModal.invitation.name }}
+              </ion-title>
+              <ion-buttons slot="end">
+                <ion-button @click="invitationModal.setOpen(false)">Close</ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content class="ion-padding" :fullscreen="true" :scroll-y="false">
+            <h1 class="ion-text-center ion-padding-vertical ion-margin-vertical">
+              {{ invitationModal.invitation.name }}
+              <small style="display: block;" class="ion-margin-top">
+                [{{ invitationModal.invitation.guest_code }}]
+              </small>
+            </h1>
+            <div style="display: flex; align-items: center; justify-content: space-between;"
+                 class="ion-padding-top ion-margin-top">
+              <div>
+                Table<br>
+                <h3>
+                  {{ invitationModal.invitation.seating.name ?? '-' }}
+                </h3>
+              </div>
+              <div>
+                Guests<br>
+                <h3>
+                  <span v-if="invitationModal.invitation.is_family">Family</span>
+                  ({{ invitationModal.invitation.pax ?? invitationModal.invitation.guests }})
+                </h3>
+              </div>
+            </div>
+            <ion-loading
+                :is-open="state.isLoading"/>
+          </ion-content>
+          <ion-footer>
+            <ion-toolbar style="min-height: 120px;">
+              <div class="ion-text-center">
+                <h2 style="font-size: 52px;" class="ion-margin-vertical">
+                  <template v-if="invitationModal.invitation.attendance">
+                    {{ invitationModal.invitation.attendance.serial_number ?? '-' }}
+                    <ion-text color="medium">
+                      <small style="display: block; font-size: 16px">
+                        (18:12:34)
+                      </small>
+                    </ion-text>
+                  </template>
+                </h2>
+              </div>
+            </ion-toolbar>
+            <ion-toolbar class="ion-padding-vertical" style="padding-bottom: 16px;">
+              <ion-button expand="block" :color="checkInButton[confirmCheckIn].color"
+                          class="ion-padding-horizontal"
+                          ref="btnProgress"
+                          size="large" mode="ios"
+                          @click="handleCheckIn">
+                {{ checkInButton[confirmCheckIn].text }}
+              </ion-button>
+            </ion-toolbar>
+          </ion-footer>
+        </ion-page>
+      </ion-modal>
     </ion-content>
     <ion-footer>
       <ion-toolbar class="ion-padding-vertical" style="padding-bottom: 16px;">
@@ -162,7 +228,7 @@
 </style>
 
 <script>
-import {computed, defineComponent, inject, ref} from 'vue';
+import {computed, defineComponent, inject, reactive, ref} from 'vue';
 import {qrCodeSharp} from 'ionicons/icons';
 import {
   IonButton,
@@ -176,6 +242,8 @@ import {
   IonItemGroup,
   IonLabel,
   IonList,
+  IonLoading,
+  IonModal,
   IonNote,
   IonPage,
   IonPopover,
@@ -185,10 +253,10 @@ import {
   IonSegment,
   IonSegmentButton,
   IonSkeletonText,
+  IonText,
   IonThumbnail,
   IonTitle,
-  IonToolbar,
-  useIonRouter
+  IonToolbar
 } from '@ionic/vue';
 import {useQuery} from '@urql/vue';
 import {GROUPED_INVITATIONS_QUERY} from '@/graphql/queries';
@@ -218,13 +286,57 @@ export default defineComponent({
     IonNote,
     IonSegment,
     IonSegmentButton,
-    IonFooter
+    IonFooter,
+    IonModal,
+    IonLoading,
+    IonText
   },
   setup() {
     const {state} = inject('store');
-    const ionRouter = useIonRouter();
 
     const search = ref('');
+    const invitationModal = reactive({
+      isOpen: false,
+      invitation: null,
+
+      setOpen(open) {
+        this.isOpen = open;
+      }
+    });
+
+    const confirmCheckIn = ref(0);
+    const btnProgress = ref();
+    const checkInButton = ref([
+      {
+        color: 'primary',
+        text: 'CHECK IN'
+      },
+      {
+        color: 'success',
+        text: 'CONFIRM CHECK IN'
+      }
+    ]);
+
+    async function handleCheckIn() {
+      confirmCheckIn.value++;
+
+      btnProgress.value.$el.classList.add('btn-progress');
+      setTimeout(() => {
+        btnProgress.value.$el.classList.add('btn-progress--start');
+      }, 1);
+
+      if (confirmCheckIn.value < 2) {
+        setTimeout(() => {
+          btnProgress.value.$el.classList.remove('btn-progress', 'btn-progress--start');
+          confirmCheckIn.value = 0;
+        }, 3000);
+      } else {
+        state.isLoading = true;
+        confirmCheckIn.value = 0;
+        btnProgress.value.$el.classList.remove('btn-progress', 'btn-progress--start');
+        setTimeout(() => state.isLoading = false, 1000);
+      }
+    }
 
     const filteredInvitations = computed(() => {
       if (!search.value) {
@@ -266,7 +378,8 @@ export default defineComponent({
     }
 
     function showInvitation(invitation) {
-      ionRouter.push({name: 'invitations.show', params: {guest_code: invitation.guest_code}});
+      invitationModal.invitation = invitation;
+      invitationModal.setOpen(true);
     }
 
     return {
@@ -277,7 +390,13 @@ export default defineComponent({
       search,
       doRefresh,
       showInvitation,
-      state
+      state,
+
+      invitationModal,
+      checkInButton,
+      confirmCheckIn,
+      btnProgress,
+      handleCheckIn
     };
   }
 });
