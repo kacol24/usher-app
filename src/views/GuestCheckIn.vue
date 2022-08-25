@@ -57,7 +57,7 @@
   </ion-page>
 </template>
 
-<style>
+<style scoped>
 .btn-progress::part(native):before {
   content: '';
   display: block;

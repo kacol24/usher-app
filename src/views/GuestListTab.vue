@@ -1,5 +1,5 @@
 <template>
-  <ion-page>
+  <ion-page ref="pageRef">
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
@@ -145,8 +145,12 @@
         </ion-item-group>
       </ion-list>
 
-      <ion-modal :is-open="invitationModal.isOpen">
-        <ion-page>
+      <ion-modal
+          :is-open="invitationModal.isOpen"
+          :can-dismiss="true"
+          :presenting-element="invitationModal.presentingElement"
+          @willDismiss="invitationModal.setOpen(false)">
+        <div class="ion-page">
           <ion-header>
             <ion-toolbar>
               <ion-title>
@@ -157,50 +161,52 @@
               </ion-buttons>
             </ion-toolbar>
           </ion-header>
-          <ion-content class="ion-padding" :fullscreen="true" :scroll-y="false">
-            <h1 class="ion-text-center ion-padding-vertical ion-margin-vertical">
-              {{ invitationModal.invitation.name }}
-              <small style="display: block;" class="ion-margin-top">
-                [{{ invitationModal.invitation.guest_code }}]
-              </small>
-            </h1>
-            <div style="display: flex; align-items: center; justify-content: space-between;"
-                 class="ion-padding-top ion-margin-top">
-              <div>
-                Table<br>
-                <h3>
-                  {{ invitationModal.invitation.seating.name ?? '-' }}
-                </h3>
-              </div>
-              <div>
-                Guests<br>
-                <h3>
-                  <span v-if="invitationModal.invitation.is_family">Family</span>
-                  ({{ invitationModal.invitation.pax ?? invitationModal.invitation.guests }})
-                </h3>
+          <ion-content :scroll-y="false">
+            <div class="ion-padding">
+              <h1 class="ion-text-center ion-padding-vertical ion-margin-vertical">
+                {{ invitationModal.invitation.name }}
+                <small style="display: block;" class="ion-margin-top">
+                  {{ invitationModal.invitation.guest_code }}
+                </small>
+              </h1>
+              <div style="display: flex; align-items: center; justify-content: space-between;"
+                   class="ion-padding-top ion-margin-top">
+                <div>
+                  Table<br>
+                  <h3>
+                    {{ invitationModal.invitation.seating?.name ?? '-' }}
+                  </h3>
+                </div>
+                <div>
+                  Guests<br>
+                  <h3>
+                    <span v-if="invitationModal.invitation.is_family">
+                      Family
+                    </span>
+                    ({{ invitationModal.invitation.pax ?? invitationModal.invitation.guests }})
+                  </h3>
+                </div>
               </div>
             </div>
-            <ion-loading
-                :is-open="state.isLoading"/>
           </ion-content>
           <ion-footer>
             <ion-toolbar style="min-height: 120px;">
-              <div class="ion-text-center">
+              <div class="ion-text-center"
+                   v-if="invitationModal.invitation.attendance">
                 <h2 style="font-size: 52px;" class="ion-margin-vertical">
-                  <template v-if="invitationModal.invitation.attendance">
-                    {{ invitationModal.invitation.attendance.serial_number ?? '-' }}
-                    <ion-text color="medium">
-                      <small style="display: block; font-size: 16px">
-                        (18:12:34)
-                      </small>
-                    </ion-text>
-                  </template>
+                  {{ invitationModal.invitation.attendance?.serial_number }}
+                  <ion-text color="medium">
+                    <small style="display: block; font-size: 16px">
+                      ({{ invitationModal.invitation.attendance?.checkin_time }})
+                    </small>
+                  </ion-text>
                 </h2>
               </div>
             </ion-toolbar>
-            <ion-toolbar class="ion-padding-vertical" style="padding-bottom: 16px;">
+            <ion-toolbar style="padding-bottom: 16px;">
               <ion-button expand="block" :color="checkInButton[confirmCheckIn].color"
-                          class="ion-padding-horizontal"
+                          class="ion-padding-horizontal btn-progress"
+                          :class="{ 'btn-progress--start': confirmCheckIn === 1 }"
                           ref="btnProgress"
                           size="large" mode="ios"
                           @click="handleCheckIn">
@@ -208,8 +214,9 @@
               </ion-button>
             </ion-toolbar>
           </ion-footer>
-        </ion-page>
+        </div>
       </ion-modal>
+      <ion-loading :is-open="invitationModal.isLoading"/>
     </ion-content>
     <ion-footer>
       <ion-toolbar class="ion-padding-vertical" style="padding-bottom: 16px;">
@@ -225,10 +232,28 @@
 .scroller {
   height: 100%;
 }
+
+.btn-progress::part(native):before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(1);
+  transform-origin: center left;
+}
+
+.btn-progress--start::part(native):before {
+  background-color: var(--ion-color-success-shade);
+  transition: transform 3s linear;
+  transform: scaleX(0);
+}
 </style>
 
 <script>
-import {computed, defineComponent, inject, reactive, ref} from 'vue';
+import {computed, defineComponent, inject, onMounted, reactive, ref} from 'vue';
 import {qrCodeSharp} from 'ionicons/icons';
 import {
   IonButton,
@@ -241,8 +266,7 @@ import {
   IonItemDivider,
   IonItemGroup,
   IonLabel,
-  IonList,
-  IonLoading,
+  IonList, IonLoading,
   IonModal,
   IonNote,
   IonPage,
@@ -288,16 +312,21 @@ export default defineComponent({
     IonSegmentButton,
     IonFooter,
     IonModal,
-    IonLoading,
-    IonText
+    IonText,
+    IonLoading
   },
   setup() {
     const {state} = inject('store');
 
     const search = ref('');
+
+    const pageRef = ref();
     const invitationModal = reactive({
       isOpen: false,
+      isLoading: false,
+
       invitation: null,
+      presentingElement: null,
 
       setOpen(open) {
         this.isOpen = open;
@@ -317,24 +346,26 @@ export default defineComponent({
       }
     ]);
 
+    let confirmTimer;
+
     async function handleCheckIn() {
       confirmCheckIn.value++;
 
-      btnProgress.value.$el.classList.add('btn-progress');
-      setTimeout(() => {
-        btnProgress.value.$el.classList.add('btn-progress--start');
-      }, 1);
-
       if (confirmCheckIn.value < 2) {
-        setTimeout(() => {
-          btnProgress.value.$el.classList.remove('btn-progress', 'btn-progress--start');
+        confirmTimer = setTimeout(() => {
           confirmCheckIn.value = 0;
         }, 3000);
       } else {
-        state.isLoading = true;
+        clearTimeout(confirmTimer);
         confirmCheckIn.value = 0;
-        btnProgress.value.$el.classList.remove('btn-progress', 'btn-progress--start');
-        setTimeout(() => state.isLoading = false, 1000);
+        invitationModal.isLoading = true;
+        setTimeout(() => {
+          invitationModal.invitation.attendance = {
+            serial_number: 'A001',
+            checkin_time: '12:34:56'
+          };
+          invitationModal.isLoading = false;
+        }, 1000);
       }
     }
 
@@ -382,6 +413,10 @@ export default defineComponent({
       invitationModal.setOpen(true);
     }
 
+    onMounted(() => {
+      invitationModal.presentingElement = pageRef.value.$el;
+    });
+
     return {
       icons: {
         qrCode: qrCodeSharp
@@ -396,7 +431,8 @@ export default defineComponent({
       checkInButton,
       confirmCheckIn,
       btnProgress,
-      handleCheckIn
+      handleCheckIn,
+      pageRef
     };
   }
 });
