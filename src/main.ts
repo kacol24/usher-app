@@ -26,18 +26,17 @@ import './theme/variables.css';
 
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 
-import {DynamicScroller, DynamicScrollerItem} from "vue-virtual-scroller";
+import {RecycleScroller} from "vue-virtual-scroller";
 
 const app = createApp(App)
     .use(IonicVue)
     .use(router)
     .use(urql, {
-      url: process.env.VUE_APP_API_URL + '/graphql'
+        url: process.env.VUE_APP_API_URL + '/graphql'
     });
 
-app.component('DynamicScroller', DynamicScroller);
-app.component('DynamicScrollerItem', DynamicScrollerItem);
+app.component('RecycleScroller', RecycleScroller);
 
 router.isReady().then(() => {
-  app.mount('#app');
+    app.mount('#app');
 });

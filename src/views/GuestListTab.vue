@@ -34,11 +34,6 @@
       </ion-refresher>
 
       <ion-list v-if="state.isLoading">
-        <ion-item-divider sticky>
-          <ion-label style="width: 10%;">
-            <ion-skeleton-text animated style="width: 100%;"/>
-          </ion-label>
-        </ion-item-divider>
         <ion-item v-for="invitation in Array(10)" :key="invitation">
           <ion-thumbnail slot="start">
             <ion-skeleton-text animated/>
@@ -63,29 +58,14 @@
       </ion-list>
 
       <ion-list v-else>
-        <ion-item-group v-for="invitationRow in invitations" :key="invitationRow.key">
-          <ion-item-divider sticky color="light">
-            <ion-label>
-              {{ invitationRow.key }}
-            </ion-label>
-          </ion-item-divider>
-          <DynamicScroller class="scroller ion-content-scroll-host"
-                           :min-item-size="143"
-                           :items="invitationRow.invitations"
-                           key-field="guest_code"
-          >
-            <template v-slot="{ item, index, active }">
-              <DynamicScrollerItem
-                  :item="item"
-                  :active="active"
-                  :size-dependencies="[item.name]"
-                  :data-index="index"
-              >
-                <InvitationItem @click="showInvitation(item)" :invitation="item"/>
-              </DynamicScrollerItem>
-            </template>
-          </DynamicScroller>
-        </ion-item-group>
+        <RecycleScroller class="ion-content-scroll-host scroller"
+                         :items="invitations"
+                         :item-size="163"
+                         key-field="guest_code">
+          <template #default="{ item }">
+            <InvitationItem @click="showInvitation(item)" :invitation="item"/>
+          </template>
+        </RecycleScroller>
       </ion-list>
 
       <ion-modal
@@ -206,8 +186,6 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
-  IonItemDivider,
-  IonItemGroup,
   IonLabel,
   IonList,
   IonLoading,
@@ -221,11 +199,12 @@ import {
   IonSkeletonText,
   IonText,
   IonThumbnail,
-  IonTitle, IonToggle,
+  IonTitle,
+  IonToggle,
   IonToolbar
 } from '@ionic/vue';
 import {useQuery} from '@urql/vue';
-import {GROUPED_INVITATIONS_QUERY} from '@/graphql/queries';
+import {ALL_INVITATIONS_QUERY} from '@/graphql/queries';
 import InvitationItem from '@/components/InvitationItem';
 
 export default defineComponent({
@@ -247,8 +226,6 @@ export default defineComponent({
     IonButton,
     IonIcon,
     IonPopover,
-    IonItemGroup,
-    IonItemDivider,
     IonThumbnail,
     IonNote,
     IonFooter,
@@ -319,23 +296,14 @@ export default defineComponent({
         return state.invitations;
       }
 
-      let filtered = state.invitations.map(invitationGroup => {
-        let invitations = invitationGroup.invitations.filter(invitation => {
-          return invitation.name.toLowerCase().includes(search.value.toLowerCase()) ||
-              invitation.guest_code.toLowerCase().includes(search.value.toLowerCase());
-        });
-
-        return {
-          key: invitationGroup.key,
-          invitations: invitations
-        };
+      return state.invitations.filter(invitation => {
+        return invitation.name.toLowerCase().includes(search.value.toLowerCase()) ||
+            invitation.guest_code.toLowerCase().includes(search.value.toLowerCase());
       });
-
-      return filtered.filter(invitationGroup => invitationGroup.invitations.length);
     });
 
     const {executeQuery, data: response} = useQuery({
-      query: GROUPED_INVITATIONS_QUERY
+      query: ALL_INVITATIONS_QUERY
     });
 
     async function doRefresh(e) {
@@ -351,7 +319,7 @@ export default defineComponent({
       await executeQuery({
         requestPolicy: 'network-only'
       });
-      pushInvitations(response.value.groupedInvitations);
+      pushInvitations(response.value.invitations);
     }
 
     function pushInvitations(invitations) {

@@ -9,7 +9,7 @@ import {IonApp, IonRouterOutlet} from '@ionic/vue';
 import {defineComponent, onMounted, provide} from 'vue';
 import store from '@/store';
 import {useQuery} from '@urql/vue';
-import {GROUPED_INVITATIONS_QUERY} from '@/graphql/queries';
+import {ALL_INVITATIONS_QUERY} from '@/graphql/queries';
 
 export default defineComponent({
   name: 'App',
@@ -21,14 +21,14 @@ export default defineComponent({
     provide('store', store);
 
     const {executeQuery, data: response} = useQuery({
-      query: GROUPED_INVITATIONS_QUERY
+      query: ALL_INVITATIONS_QUERY
     });
 
     store.state.isLoading = true;
     onMounted(async () => {
       if (!store.state.invitations.length) {
         await executeQuery();
-        store.state.invitations = response.value.groupedInvitations;
+        store.state.invitations = response.value.invitations;
       }
       store.state.isLoading = false;
     });
