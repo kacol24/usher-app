@@ -81,51 +81,7 @@
                   :size-dependencies="[item.name]"
                   :data-index="index"
               >
-                <ion-item button @click="showInvitation(item)">
-                  <ion-thumbnail slot="start" class="ion-align-items-center ion-justify-content-center"
-                                 style="display: flex;">
-                    <span v-if="item.attendance">
-                      {{ item.attendance.serial_number }}
-                    </span>
-                    <span v-else>
-                      -
-                    </span>
-                  </ion-thumbnail>
-                  <ion-label class="ion-padding-vertical">
-                    <div style="display: flex;align-items: center;justify-content: space-between;">
-                      <h3>
-                        [{{ item.guest_code }}]
-                      </h3>
-                      <ion-note v-if="item.group">
-                        <h3>
-                          {{ item.group.group_name }}
-                        </h3>
-                      </ion-note>
-                    </div>
-                    <h2 class="ion-text-wrap ion-padding-vertical" style="margin: 0;">
-                      {{ item.name }}
-                    </h2>
-                    <div style="display: flex; align-items: center; justify-content: space-between; font-size: 80%;">
-                      <ion-note>
-                        <h3>
-                          Table:
-                          <strong>{{ item.seating?.name ?? '-' }}</strong><br>
-                        </h3>
-                      </ion-note>
-                      <ion-note>
-                        <h3>
-                          Guests:
-                          <strong>
-                            <span v-if="item.is_family">
-                              Family
-                            </span>
-                            ({{ item.pax ?? item.guests }})
-                          </strong>
-                        </h3>
-                      </ion-note>
-                    </div>
-                  </ion-label>
-                </ion-item>
+                <InvitationItem @click="showInvitation(item)" :invitation="item"/>
               </DynamicScrollerItem>
             </template>
           </DynamicScroller>
@@ -157,7 +113,7 @@
                 </small>
               </h1>
               <div style="display: flex; align-items: center; justify-content: space-between;"
-                   class="ion-padding-top ion-margin-top">
+                   class="ion-padding-vertical ion-margin-vertical">
                 <div>
                   Table<br>
                   <h3>
@@ -173,6 +129,14 @@
                     ({{ invitationModal.invitation.pax ?? invitationModal.invitation.guests }})
                   </h3>
                 </div>
+              </div>
+              <div style="display: flex;justify-content: center;align-items: center;flex-direction: column;">
+                <div class="ion-margin-bottom">
+                  Gift
+                </div>
+                <ion-toggle
+                    :checked="invitationModal.hasGift"
+                    @ionChange="invitationModal.hasGift = ! invitationModal.hasGift"/>
               </div>
             </div>
           </ion-content>
@@ -257,11 +221,12 @@ import {
   IonSkeletonText,
   IonText,
   IonThumbnail,
-  IonTitle,
+  IonTitle, IonToggle,
   IonToolbar
 } from '@ionic/vue';
 import {useQuery} from '@urql/vue';
 import {GROUPED_INVITATIONS_QUERY} from '@/graphql/queries';
+import InvitationItem from '@/components/InvitationItem';
 
 export default defineComponent({
   name: 'GuestListTab',
@@ -289,7 +254,9 @@ export default defineComponent({
     IonFooter,
     IonModal,
     IonText,
-    IonLoading
+    IonLoading,
+    InvitationItem,
+    IonToggle
   },
   setup() {
     const {state} = inject('store');
@@ -300,6 +267,7 @@ export default defineComponent({
     const invitationModal = reactive({
       isOpen: false,
       isLoading: false,
+      hasGift: true,
 
       invitation: null,
       presentingElement: null,
@@ -383,14 +351,23 @@ export default defineComponent({
       await executeQuery({
         requestPolicy: 'network-only'
       });
+      pushInvitations(response.value.groupedInvitations);
+    }
+
+    function pushInvitations(invitations) {
       state.invitations = [];
-      response.value.groupedInvitations.forEach(invitation => {
+      invitations.forEach(invitation => {
         state.invitations.push(invitation);
       });
     }
 
+    function checkIn(guestCode, hasGift) {
+      console.log(guestCode);
+    }
+
     function showInvitation(invitation) {
       invitationModal.invitation = invitation;
+      invitationModal.hasGift = invitation.attendance?.has_gift ?? true;
       invitationModal.setOpen(true);
     }
 

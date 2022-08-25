@@ -8,8 +8,9 @@ export const ALL_INVITATIONS_QUERY = gql`
             full_name
             guests
             pax
+            is_family
             group {
-                name
+                group_name
             }
             seating {
                 name
@@ -17,6 +18,8 @@ export const ALL_INVITATIONS_QUERY = gql`
             attendance {
                 serial_number
                 created_at
+                checkin_time
+                has_gift
             }
         }
     }
@@ -43,6 +46,7 @@ export const GROUPED_INVITATIONS_QUERY = gql`
                     serial_number
                     created_at
                     checkin_time
+                    has_gift
                 }
             }
         }
