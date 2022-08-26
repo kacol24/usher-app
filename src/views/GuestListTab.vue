@@ -151,6 +151,12 @@
           message="Check-in success!"
           color="success"
           @didDismiss="toast.setOpen(false)"/>
+      <ion-toast
+          :is-open="errorToast.isOpen"
+          duration="2000"
+          :message="errorToast.message"
+          color="danger"
+          @didDismiss="errorToast.setOpen(false)"/>
       <ion-fab
           vertical="bottom"
           horizontal="center"
@@ -266,6 +272,15 @@ export default defineComponent({
 
     const toast = reactive({
       isOpen: false,
+
+      setOpen(open) {
+        this.isOpen = open;
+      }
+    });
+
+    const errorToast = reactive({
+      isOpen: false,
+      message: 'Whoops! Something went wrong',
 
       setOpen(open) {
         this.isOpen = open;
@@ -407,8 +422,19 @@ export default defineComponent({
       },
 
       onScanSuccess(decodedText) {
-        search.value = decodedText;
+        let query = decodedText;
         scanner.stopScan();
+
+        let filteredInvitation = state.invitations.filter(invitation => {
+          return invitation.guest_code.includes(query);
+        });
+
+        if (filteredInvitation.length) {
+          return showInvitation(filteredInvitation[0]);
+        }
+
+        errorToast.message = 'Invitation not found!';
+        errorToast.isOpen = true;
       }
     });
 
@@ -434,6 +460,7 @@ export default defineComponent({
       pageRef,
 
       toast,
+      errorToast,
       scanner
     };
   }
