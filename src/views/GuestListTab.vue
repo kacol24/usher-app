@@ -123,12 +123,12 @@
           <ion-footer>
             <ion-toolbar style="min-height: 110px;">
               <div class="ion-text-center"
-                   v-if="invitationModal.invitation.attendance">
+                   v-if="invitationModal.serialNumber">
                 <h1 class="ion-margin-vertical" style="font-size: 39px">
-                  {{ invitationModal.invitation.attendance?.serial_number }}
+                  {{ invitationModal.serialNumber }}
                   <ion-text color="medium">
                     <small style="display: block; font-size: 16px">
-                      ({{ invitationModal.invitation.attendance?.checkin_time }})
+                      ({{ invitationModal.checkinTime }})
                     </small>
                   </ion-text>
                 </h1>
@@ -203,9 +203,10 @@ import {
   IonToggle,
   IonToolbar
 } from '@ionic/vue';
-import {useQuery} from '@urql/vue';
+import {useQuery, useMutation} from '@urql/vue';
 import {ALL_INVITATIONS_QUERY} from '@/graphql/queries';
 import InvitationItem from '@/components/InvitationItem';
+import {CHECKIN_MUTATION} from '@/graphql/mutations';
 
 export default defineComponent({
   name: 'GuestListTab',
@@ -240,14 +241,19 @@ export default defineComponent({
 
     const search = ref('');
 
+    const {executeMutation: checkIn} = useMutation(CHECKIN_MUTATION);
+
     const pageRef = ref();
     const invitationModal = reactive({
+      presentingElement: null,
+
       isOpen: false,
       isLoading: false,
-      hasGift: true,
 
       invitation: null,
-      presentingElement: null,
+      serialNumber: null,
+      checkinTime: null,
+      hasGift: true,
 
       setOpen(open) {
         this.isOpen = open;
@@ -279,15 +285,19 @@ export default defineComponent({
       } else {
         clearTimeout(confirmTimer);
         confirmCheckIn.value = 0;
+
         invitationModal.isLoading = true;
-
-        await fetchInvitations();
-
-        invitationModal.isLoading = false;
-        invitationModal.invitation.attendance = {
-          serial_number: 'A001',
-          checkin_time: '12:34:56'
+        const payload = {
+          guest_code: invitationModal.invitation.guest_code,
+          has_gift: invitationModal.hasGift
         };
+        const {data: checkinResponse} = await checkIn(payload);
+        invitationModal.isLoading = false;
+
+        invitationModal.serialNumber = checkinResponse.checkIn.attendance.serial_number;
+        invitationModal.checkinTime = checkinResponse.checkIn.attendance.checkin_time;
+
+        pushInvitations(checkinResponse.checkIn.invitations);
       }
     }
 
@@ -329,13 +339,11 @@ export default defineComponent({
       });
     }
 
-    function checkIn(guestCode, hasGift) {
-      console.log(guestCode);
-    }
-
     function showInvitation(invitation) {
       invitationModal.invitation = invitation;
       invitationModal.hasGift = invitation.attendance?.has_gift ?? true;
+      invitationModal.serialNumber = invitation.attendance?.serial_number;
+      invitationModal.checkin_time = invitation.attendance?.checkin_time;
       invitationModal.setOpen(true);
     }
 
