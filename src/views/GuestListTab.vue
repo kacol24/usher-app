@@ -380,10 +380,7 @@ export default defineComponent({
     }
 
     function pushInvitations(invitations) {
-      state.invitations = [];
-      invitations.forEach(invitation => {
-        state.invitations.push(invitation);
-      });
+      state.invitations = invitations;
     }
 
     function showInvitation(invitation) {
