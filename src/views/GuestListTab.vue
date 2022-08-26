@@ -403,7 +403,7 @@ export default defineComponent({
         this.isStarted = true;
         qrScanner = new QrScanner(
             document.getElementById('scannerView'),
-            result => this.onScanSuccess(result),
+            result => this.onScanSuccess(result.data),
             {
               highlightScanRegion: true
             }
