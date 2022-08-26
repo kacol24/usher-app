@@ -3,7 +3,8 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button id="filter-group">
+          <ion-button id="filter-group"
+                      :disabled="state.isLoading">
             Groups
           </ion-button>
           <ion-popover trigger="filter-group" trigger-action="click">
@@ -11,11 +12,6 @@
           </ion-popover>
         </ion-buttons>
         <ion-title>Guest List</ion-title>
-        <ion-buttons slot="end">
-          <ion-button>
-            <ion-icon slot="icon-only" :icon="icons.qrCode"></ion-icon>
-          </ion-button>
-        </ion-buttons>
       </ion-toolbar>
       <ion-toolbar>
         <form>
@@ -24,6 +20,7 @@
                          show-cancel-button="focus"
                          show-clear-button="focus"
                          type="search"
+                         :disabled="state.isLoading"
                          v-model="search"/>
         </form>
       </ion-toolbar>
@@ -154,7 +151,22 @@
           message="Check-in success!"
           color="success"
           @didDismiss="toast.setOpen(false)"/>
+      <ion-fab
+          vertical="bottom"
+          horizontal="center"
+          slot="fixed">
+        <ion-fab-button
+            :disabled="state.isLoading"
+            :activated="scanner.isStarted"
+            @click="scanner.startScan()">
+          <ion-icon :icon="icons.qrCode"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
     </ion-content>
+    <div v-show="scanner.isStarted"
+         style="display: block;position: fixed;top: 0;left: 0;width: 100%;height: 100%;z-index: 998;background-color:#fff;">
+      <div id="reader" style="width: 100%;"></div>
+    </div>
   </ion-page>
 </template>
 
@@ -188,7 +200,7 @@ import {qrCodeSharp} from 'ionicons/icons';
 import {
   IonButton,
   IonButtons,
-  IonContent,
+  IonContent, IonFab, IonFabButton,
   IonFooter,
   IonHeader,
   IonIcon,
@@ -214,6 +226,7 @@ import {useQuery, useMutation} from '@urql/vue';
 import {ALL_INVITATIONS_QUERY} from '@/graphql/queries';
 import InvitationItem from '@/components/InvitationItem';
 import {CHECKIN_MUTATION} from '@/graphql/mutations';
+import {Html5QrcodeScanner, Html5QrcodeScanType, Html5QrcodeSupportedFormats} from 'html5-qrcode';
 
 export default defineComponent({
   name: 'GuestListTab',
@@ -242,7 +255,9 @@ export default defineComponent({
     IonLoading,
     InvitationItem,
     IonToggle,
-    IonToast
+    IonToast,
+    IonFab,
+    IonFabButton
   },
   setup() {
     const {state} = inject('store');
@@ -364,6 +379,39 @@ export default defineComponent({
       invitationModal.setOpen(true);
     }
 
+    let html5QrcodeScanner;
+    const scanner = reactive({
+      isStarted: false,
+
+      startScan() {
+        if (this.isStarted) {
+          return this.stopScan();
+        }
+
+        this.isStarted = true;
+        html5QrcodeScanner = new Html5QrcodeScanner(
+            'reader',
+            {
+              fps: 10,
+              qrbox: {width: 250, height: 250},
+              supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+              formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE]
+            },
+            false
+        );
+        html5QrcodeScanner.render(this.onScanSuccess);
+      },
+      stopScan() {
+        this.isStarted = false;
+        html5QrcodeScanner.pause();
+      },
+
+      onScanSuccess(decodedText, decodedResult) {
+        search.value = decodedResult;
+        this.stopScan();
+      }
+    });
+
     onMounted(() => {
       invitationModal.presentingElement = pageRef.value.$el;
     });
@@ -385,7 +433,8 @@ export default defineComponent({
       handleCheckIn,
       pageRef,
 
-      toast
+      toast,
+      scanner
     };
   }
 });
