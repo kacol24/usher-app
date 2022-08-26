@@ -171,7 +171,7 @@
     </ion-content>
     <div v-show="scanner.isStarted"
          style="display: block;position: fixed;top: 0;left: 0;width: 100%;height: 100%;z-index: 998;background-color:#fff;">
-      <div id="reader" style="width: 100%;"></div>
+      <video id="scannerView" style="width: 100%;"></video>
     </div>
   </ion-page>
 </template>
@@ -232,7 +232,7 @@ import {useQuery, useMutation} from '@urql/vue';
 import {ALL_INVITATIONS_QUERY} from '@/graphql/queries';
 import InvitationItem from '@/components/InvitationItem';
 import {CHECKIN_MUTATION} from '@/graphql/mutations';
-import {Html5QrcodeScanner, Html5QrcodeScanType, Html5QrcodeSupportedFormats} from 'html5-qrcode';
+import QrScanner from 'qr-scanner';
 
 export default defineComponent({
   name: 'GuestListTab',
@@ -394,7 +394,7 @@ export default defineComponent({
       invitationModal.setOpen(true);
     }
 
-    let html5QrcodeScanner;
+    let qrScanner;
     const scanner = reactive({
       isStarted: false,
 
@@ -404,21 +404,18 @@ export default defineComponent({
         }
 
         this.isStarted = true;
-        html5QrcodeScanner = new Html5QrcodeScanner(
-            'reader',
+        qrScanner = new QrScanner(
+            document.getElementById('scannerView'),
+            result => this.onScanSuccess(result),
             {
-              fps: 10,
-              qrbox: {width: 250, height: 250},
-              supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
-              formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE]
-            },
-            false
+              highlightScanRegion: true
+            }
         );
-        html5QrcodeScanner.render(this.onScanSuccess);
+        qrScanner.start();
       },
       stopScan() {
         this.isStarted = false;
-        html5QrcodeScanner.pause();
+        qrScanner.stop();
       },
 
       onScanSuccess(decodedText) {
