@@ -406,9 +406,9 @@ export default defineComponent({
         html5QrcodeScanner.pause();
       },
 
-      onScanSuccess(decodedText, decodedResult) {
-        search.value = decodedResult;
-        this.stopScan();
+      onScanSuccess(decodedText) {
+        search.value = decodedText;
+        scanner.stopScan();
       }
     });
 
