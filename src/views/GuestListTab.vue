@@ -86,7 +86,7 @@
           </ion-header>
           <ion-content :scroll-y="false">
             <div class="ion-padding">
-              <h1 class="ion-text-center ion-padding-vertical ion-margin-vertical">
+              <h1 class="ion-padding-vertical ion-margin-vertical" style="text-align: center;">
                 {{ invitationModal.invitation.name }}
                 <small style="display: block;" class="ion-margin-top">
                   {{ invitationModal.invitation.guest_code }}
@@ -122,7 +122,7 @@
           </ion-content>
           <ion-footer>
             <ion-toolbar style="min-height: 110px;">
-              <div class="ion-text-center"
+              <div style="text-align: center;"
                    v-if="invitationModal.serialNumber">
                 <h1 class="ion-margin-vertical" style="font-size: 39px">
                   {{ invitationModal.serialNumber }}
@@ -146,7 +146,14 @@
           </ion-footer>
         </div>
       </ion-modal>
-      <ion-loading :is-open="invitationModal.isLoading"/>
+      <ion-loading
+          :is-open="invitationModal.isLoading"/>
+      <ion-toast
+          :is-open="toast.isOpen"
+          duration="2000"
+          message="Check-in success!"
+          color="success"
+          @didDismiss="toast.setOpen(false)"/>
     </ion-content>
   </ion-page>
 </template>
@@ -199,7 +206,7 @@ import {
   IonSkeletonText,
   IonText,
   IonThumbnail,
-  IonTitle,
+  IonTitle, IonToast,
   IonToggle,
   IonToolbar
 } from '@ionic/vue';
@@ -234,12 +241,21 @@ export default defineComponent({
     IonText,
     IonLoading,
     InvitationItem,
-    IonToggle
+    IonToggle,
+    IonToast
   },
   setup() {
     const {state} = inject('store');
 
     const search = ref('');
+
+    const toast = reactive({
+      isOpen: false,
+
+      setOpen(open) {
+        this.isOpen = open;
+      }
+    });
 
     const {executeMutation: checkIn} = useMutation(CHECKIN_MUTATION);
 
@@ -296,6 +312,7 @@ export default defineComponent({
 
         invitationModal.serialNumber = checkinResponse.checkIn.attendance.serial_number;
         invitationModal.checkinTime = checkinResponse.checkIn.attendance.checkin_time;
+        toast.isOpen = true;
 
         pushInvitations(checkinResponse.checkIn.invitations);
       }
@@ -343,7 +360,7 @@ export default defineComponent({
       invitationModal.invitation = invitation;
       invitationModal.hasGift = invitation.attendance?.has_gift ?? true;
       invitationModal.serialNumber = invitation.attendance?.serial_number;
-      invitationModal.checkin_time = invitation.attendance?.checkin_time;
+      invitationModal.checkinTime = invitation.attendance?.checkin_time;
       invitationModal.setOpen(true);
     }
 
@@ -366,7 +383,9 @@ export default defineComponent({
       confirmCheckIn,
       btnProgress,
       handleCheckIn,
-      pageRef
+      pageRef,
+
+      toast
     };
   }
 });
