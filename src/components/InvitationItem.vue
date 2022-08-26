@@ -1,7 +1,7 @@
 <template>
   <ion-item button>
     <ion-thumbnail slot="start"
-                   style="display: flex;align-items: center;justify-content: center;">
+                   style="display: flex;align-items: center;justify-content: center; width: 25px;height: 25px;">
       {{ invitation.attendance?.serial_number ?? '-' }}
     </ion-thumbnail>
     <ion-label class="ion-padding-vertical">
