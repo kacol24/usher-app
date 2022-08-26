@@ -427,7 +427,7 @@ export default defineComponent({
           return showInvitation(filteredInvitation[0]);
         }
 
-        errorToast.message = 'Invitation not found!';
+        errorToast.message = 'Invitation [' + query + '] not found!';
         errorToast.isOpen = true;
       }
     });
