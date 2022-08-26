@@ -11,7 +11,7 @@ export const CHECKIN_MUTATION = gql`
             sequence_group: $sequence_group,
             has_gift: $has_gift
         ) {
-            attendance { 
+            attendance {
                 serial_number
                 checkin_time
                 has_gift
@@ -28,6 +28,12 @@ export const CHECKIN_MUTATION = gql`
                 }
                 seating {
                     name
+                }
+                attendance {
+                    serial_number
+                    created_at
+                    checkin_time
+                    has_gift
                 }
             }
         }
