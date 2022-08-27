@@ -401,13 +401,6 @@ export default defineComponent({
         }
 
         this.isStarted = true;
-        qrScanner = new QrScanner(
-            document.getElementById('scannerView'),
-            result => this.onScanSuccess(result.data),
-            {
-              highlightScanRegion: true
-            }
-        );
         qrScanner.start();
       },
       stopScan() {
@@ -434,6 +427,13 @@ export default defineComponent({
 
     onMounted(() => {
       invitationModal.presentingElement = pageRef.value.$el;
+      qrScanner = new QrScanner(
+          document.getElementById('scannerView'),
+          result => scanner.onScanSuccess(result.data),
+          {
+            highlightScanRegion: true
+          }
+      );
     });
 
     return {
