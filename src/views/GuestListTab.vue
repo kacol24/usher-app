@@ -25,7 +25,7 @@
         </form>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" :scroll-y="false">
       <ion-refresher slot="fixed" @ionRefresh="doRefresh($event)">
         <ion-refresher-content/>
       </ion-refresher>
@@ -54,12 +54,13 @@
         </ion-item>
       </ion-list>
 
-      <ion-list v-else>
+      <ion-list style="height: 100%;"
+                v-else>
         <RecycleScroller class="ion-content-scroll-host scroller"
                          :items="invitations"
-                         :item-size="163"
+                         :item-size="143"
                          key-field="guest_code">
-          <template #default="{ item }">
+          <template v-slot="{ item }">
             <InvitationItem @click="showInvitation(item)" :invitation="item"/>
           </template>
         </RecycleScroller>
@@ -233,6 +234,7 @@ import {ALL_INVITATIONS_QUERY} from '@/graphql/queries';
 import InvitationItem from '@/components/InvitationItem';
 import {CHECKIN_MUTATION} from '@/graphql/mutations';
 import QrScanner from 'qr-scanner';
+import {RecycleScroller} from 'vue-virtual-scroller';
 
 export default defineComponent({
   name: 'GuestListTab',
@@ -263,7 +265,8 @@ export default defineComponent({
     IonToggle,
     IonToast,
     IonFab,
-    IonFabButton
+    IonFabButton,
+    RecycleScroller
   },
   setup() {
     const {state} = inject('store');
