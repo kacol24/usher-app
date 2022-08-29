@@ -1,8 +1,20 @@
 <template>
   <ion-page ref="pageRef">
-    <ion-header style="background-color: var(--ion-color-primary)">
+    <ion-header style="background-color: var(--ion-color-secondary)">
       <ion-toolbar color="secondary">
-        <ion-title>Guest List</ion-title>
+        <ion-title>
+          Guest List
+          <small style="display: block;font-weight: normal;">
+            Usher - {{ state.sequenceGroup }}
+          </small>
+        </ion-title>
+        <ion-buttons slot="end">
+          <ion-button color="light" router-link="/set-usher">
+            <small>
+              Change Usher
+            </small>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
       <ion-toolbar color="secondary">
         <ion-buttons slot="start">
@@ -228,7 +240,7 @@
 
 <script>
 import {computed, defineComponent, inject, onMounted, reactive, ref} from 'vue';
-import {qrCodeSharp} from 'ionicons/icons';
+import {createOutline, qrCodeSharp} from 'ionicons/icons';
 import {
   IonButton,
   IonButtons,
@@ -252,7 +264,9 @@ import {
   IonTitle,
   IonToast,
   IonToggle,
-  IonToolbar
+  IonToolbar,
+  onIonViewWillEnter,
+  useIonRouter
 } from '@ionic/vue';
 import {useMutation, useQuery} from '@urql/vue';
 import {ALL_GROUPS_QUERY, ALL_INVITATIONS_QUERY} from '@/graphql/queries';
@@ -373,7 +387,8 @@ export default defineComponent({
         invitationModal.isLoading = true;
         const payload = {
           guest_code: invitationModal.invitation.guest_code,
-          has_gift: invitationModal.hasGift
+          has_gift: invitationModal.hasGift,
+          sequence_group: state.sequenceGroup
         };
         const {data: checkinResponse} = await checkIn(payload);
         invitationModal.isLoading = false;
@@ -470,6 +485,13 @@ export default defineComponent({
       }
     });
 
+    const router = useIonRouter();
+    onIonViewWillEnter(() => {
+      if (!state.sequenceGroup) {
+        router.replace('set-usher');
+      }
+    });
+
     onMounted(() => {
       invitationModal.presentingElement = pageRef.value.$el;
       qrScanner = new QrScanner(
@@ -483,7 +505,8 @@ export default defineComponent({
 
     return {
       icons: {
-        qrCode: qrCodeSharp
+        qrCode: qrCodeSharp,
+        edit: createOutline
       },
       invitations: filteredInvitations,
       search,
