@@ -23,7 +23,7 @@
         </ion-buttons>
         <form action="" @submit.prevent>
           <ion-searchbar animated
-                         color="secondary"
+                         color="dark"
                          inputmode="search"
                          show-cancel-button="focus"
                          show-clear-button="focus"
@@ -196,6 +196,10 @@
   stroke: var(--ion-color-secondary) !important;
 }
 
+.searchbar-cancel-button {
+  --ion-color-base: var(--ion-color-light) !important;
+}
+
 .ion-color .searchbar-input {
   background: var(--ion-color-secondary-tint) !important
 }
@@ -366,9 +370,12 @@ export default defineComponent({
         return state.invitations;
       }
 
-      const invitations = state.invitations.filter(invitation => {
-        return invitation.group?.id == selectedGroup.value;
-      });
+      let invitations = state.invitations;
+      if (selectedGroup.value) {
+        invitations = state.invitations.filter(invitation => {
+          return invitation.group?.id == selectedGroup.value;
+        });
+      }
 
       return invitations.filter(invitation => {
         return invitation.name.toLowerCase().includes(search.value.toLowerCase()) ||
