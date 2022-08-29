@@ -163,13 +163,29 @@
       </ion-fab>
     </ion-content>
     <div v-show="scanner.isStarted"
-         style="display: block;position: fixed;top: 0;left: 0;width: 100%;height: 100%;z-index: 998;background-color:#fff;">
-      <video id="scannerView" style="width: 100%;"></video>
+         class="scanner__container">
+      <video id="scannerView" class="scanner__view"></video>
     </div>
   </ion-page>
 </template>
 
-<style>
+<style lang="scss">
+.scanner__container {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 998;
+  background-color: #fff;
+  line-height: 0;
+
+  .scan-region-highlight-svg {
+    stroke: var(--ion-color-secondary-tint) !important;
+  }
+}
+
 .scroller {
   height: 100%;
 }
@@ -190,10 +206,6 @@
   background-color: var(--ion-color-success-shade);
   transition: transform 3s linear;
   transform: scaleX(0);
-}
-
-.scan-region-highlight-svg {
-  stroke: var(--ion-color-secondary) !important;
 }
 
 .searchbar-cancel-button {
