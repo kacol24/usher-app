@@ -2,18 +2,33 @@
   <ion-page ref="pageRef">
     <ion-header>
       <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-button id="filter-group"
-                      :disabled="state.isLoading">
-            Groups
-          </ion-button>
-          <ion-popover trigger="filter-group" trigger-action="click">
-            <ion-content class="ion-padding" :scroll-y="false">Hello World!</ion-content>
-          </ion-popover>
-        </ion-buttons>
         <ion-title>Guest List</ion-title>
       </ion-toolbar>
       <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-select placeholder="Select fruit" interface="popover">
+            <ion-select-option value="bananas_1">Bananas 1</ion-select-option>
+            <ion-select-option value="bananas_2">Bananas 2</ion-select-option>
+            <ion-select-option value="bananas_3">Bananas 3</ion-select-option>
+            <ion-select-option value="bananas_4">Bananas 4</ion-select-option>
+            <ion-select-option value="bananas_5">Bananas 5</ion-select-option>
+            <ion-select-option value="bananas_6">Bananas 6</ion-select-option>
+            <ion-select-option value="bananas_7">Bananas 7</ion-select-option>
+            <ion-select-option value="bananas_8">Bananas 8</ion-select-option>
+            <ion-select-option value="bananas_9">Bananas 9</ion-select-option>
+            <ion-select-option value="bananas_10">Bananas 10</ion-select-option>
+            <ion-select-option value="bananas_11">Bananas 11</ion-select-option>
+            <ion-select-option value="bananas_12">Bananas 12</ion-select-option>
+            <ion-select-option value="bananas_13">Bananas 13</ion-select-option>
+            <ion-select-option value="bananas_14">Bananas 14</ion-select-option>
+            <ion-select-option value="bananas_15">Bananas 15</ion-select-option>
+            <ion-select-option value="bananas_16">Bananas 16</ion-select-option>
+            <ion-select-option value="bananas_17">Bananas 17</ion-select-option>
+            <ion-select-option value="bananas_18">Bananas 18</ion-select-option>
+            <ion-select-option value="bananas_19">Bananas 19</ion-select-option>
+            <ion-select-option value="bananas_20">Bananas 20</ion-select-option>
+          </ion-select>
+        </ion-buttons>
         <form>
           <ion-searchbar animated
                          inputmode="search"
@@ -221,7 +236,7 @@ import {
   IonPopover,
   IonRefresher,
   IonRefresherContent,
-  IonSearchbar,
+  IonSearchbar, IonSelect, IonSelectOption,
   IonSkeletonText,
   IonText,
   IonThumbnail,
@@ -254,7 +269,6 @@ export default defineComponent({
     IonButtons,
     IonButton,
     IonIcon,
-    IonPopover,
     IonThumbnail,
     IonNote,
     IonFooter,
@@ -266,7 +280,9 @@ export default defineComponent({
     IonToast,
     IonFab,
     IonFabButton,
-    RecycleScroller
+    RecycleScroller,
+    IonSelect,
+    IonSelectOption
   },
   setup() {
     const {state} = inject('store');
