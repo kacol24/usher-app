@@ -71,7 +71,7 @@ ion-thumbnail {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 25px;
+  width: 30px;
   height: 25px;
 }
 
