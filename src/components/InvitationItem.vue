@@ -1,7 +1,32 @@
 <template>
-  <ion-item button>
-    <ion-thumbnail slot="start"
-                   style="display: flex;align-items: center;justify-content: center; width: 25px;height: 25px;">
+  <ion-item v-if="skeleton">
+    <ion-thumbnail slot="start">
+      <ion-skeleton-text animated style="height: 15px;"/>
+    </ion-thumbnail>
+    <ion-label class="ion-padding-vertical">
+      <div style="display: flex;align-items: center;justify-content: space-between;">
+        <h3>
+          <ion-skeleton-text animated style="width: 60px;"/>
+        </h3>
+        <ion-note>
+          <ion-skeleton-text animated style="width: 110px;"/>
+        </ion-note>
+      </div>
+      <h2 class="ion-text-wrap ion-padding-vertical" style="margin: 0;">
+        <ion-skeleton-text animated/>
+      </h2>
+      <div style="display: flex; align-items: center; justify-content: space-between; font-size: 80%;">
+        <ion-note>
+          <ion-skeleton-text animated style="width: 100px;"/>
+        </ion-note>
+        <ion-note>
+          <ion-skeleton-text animated style="width: 100px;"/>
+        </ion-note>
+      </div>
+    </ion-label>
+  </ion-item>
+  <ion-item button :detail="false" v-else>
+    <ion-thumbnail slot="start">
       {{ invitation.attendance?.serial_number ?? '-' }}
     </ion-thumbnail>
     <ion-label class="ion-padding-vertical">
@@ -22,7 +47,7 @@
         <ion-note>
           <h3>
             Table:
-            <strong>{{ invitation.seating?.name ?? '-' }}</strong><br>
+            <strong>{{ invitation.seating?.name ?? '-' }}</strong>
           </h3>
         </ion-note>
         <ion-note>
@@ -36,20 +61,32 @@
   </ion-item>
 </template>
 
+<style scoped>
+ion-thumbnail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+}
+</style>
+
 <script>
 import {defineComponent} from 'vue';
-import {IonItem, IonLabel, IonNote, IonThumbnail} from '@ionic/vue';
+import {IonItem, IonLabel, IonNote, IonSkeletonText, IonThumbnail} from '@ionic/vue';
 
 export default defineComponent({
   name: 'InvitationItem',
-  props: [
-    'invitation'
-  ],
+  props: {
+    invitation: Object,
+    skeleton: Boolean
+  },
   components: {
     IonItem,
     IonThumbnail,
     IonLabel,
-    IonNote
+    IonNote,
+    IonSkeletonText
   }
 });
 </script>

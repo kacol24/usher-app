@@ -37,27 +37,7 @@
       </ion-refresher>
 
       <ion-list v-if="state.isLoading">
-        <ion-item v-for="invitation in Array(10)" :key="invitation">
-          <ion-thumbnail slot="start">
-            <ion-skeleton-text animated/>
-          </ion-thumbnail>
-          <ion-label class="ion-text-wrap">
-            <h2>
-              <ion-skeleton-text animated style="width: 35%;"/>
-            </h2>
-            <h3>
-              <ion-skeleton-text animated style="width: 25%;"/>
-            </h3>
-          </ion-label>
-          <ion-note slot="end" style="display: flex;flex-direction: column;align-items: flex-end;"
-                    class="ion-padding-vertical">
-            <ion-skeleton-text animated style="width: 50px;"/>
-            <ion-skeleton-text animated style="width: 100px;"/>
-            <br>
-            <ion-skeleton-text animated style="width: 70px;"/>
-            <ion-skeleton-text animated style="width: 50px;"/>
-          </ion-note>
-        </ion-item>
+        <InvitationItem v-for="invitation in Array(10)" :key="invitation" skeleton/>
       </ion-list>
 
       <ion-list style="height: 100%;"
@@ -219,12 +199,9 @@ import {
   IonFooter,
   IonHeader,
   IonIcon,
-  IonItem,
-  IonLabel,
   IonList,
   IonLoading,
   IonModal,
-  IonNote,
   IonPage,
   IonRefresher,
   IonRefresherContent,
@@ -233,7 +210,6 @@ import {
   IonSelectOption,
   IonSkeletonText,
   IonText,
-  IonThumbnail,
   IonTitle,
   IonToast,
   IonToggle,
@@ -255,8 +231,6 @@ export default defineComponent({
     IonContent,
     IonPage,
     IonList,
-    IonItem,
-    IonLabel,
     IonRefresher,
     IonRefresherContent,
     IonSkeletonText,
@@ -264,8 +238,6 @@ export default defineComponent({
     IonButtons,
     IonButton,
     IonIcon,
-    IonThumbnail,
-    IonNote,
     IonFooter,
     IonModal,
     IonText,
