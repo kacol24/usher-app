@@ -1,5 +1,7 @@
 <template>
-  <ion-item v-if="skeleton">
+  <ion-item v-if="skeleton"
+            :detail="false"
+            color="primary">
     <ion-thumbnail slot="start">
       <ion-skeleton-text animated style="height: 15px;"/>
     </ion-thumbnail>
@@ -71,6 +73,14 @@ ion-thumbnail {
   justify-content: center;
   width: 25px;
   height: 25px;
+}
+
+ion-skeleton-text {
+  --background: var(--ion-color-light) !important
+}
+
+ion-item {
+  --ion-color-shade: var(--ion-color-light) !important
 }
 </style>
 

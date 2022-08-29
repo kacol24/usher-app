@@ -6,9 +6,10 @@
       </ion-toolbar>
       <ion-toolbar color="secondary">
         <ion-buttons slot="start">
-          <ion-skeleton-text animated style="width: 100px;" v-if="isLoadingGroups"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 100px;"
+                             v-if="isLoadingGroups || state.invitations.isLoading"></ion-skeleton-text>
           <ion-select placeholder="Groups" v-else style="max-width: 100px"
-                      :interface-options="{ header: 'Filter By Group'}"
+                      :interface-options="{ header: 'Filter By Group', cssClass: 'ion-color-secondary' }"
                       :value="selectedGroup"
                       @ionChange="filterGroup.handleOnChange"
                       @ionCancel="filterGroup.handleOnCancel"
@@ -22,6 +23,7 @@
         </ion-buttons>
         <form action="" @submit.prevent>
           <ion-searchbar animated
+                         color="secondary"
                          inputmode="search"
                          show-cancel-button="focus"
                          show-clear-button="focus"
@@ -31,16 +33,17 @@
         </form>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true" :scroll-y="false">
+    <ion-content :fullscreen="true"
+                 :scroll-y="false">
       <ion-refresher slot="fixed" @ionRefresh="doRefresh($event)">
         <ion-refresher-content/>
       </ion-refresher>
 
-      <ion-list v-if="state.isLoading">
+      <ion-list v-if="state.isLoading" style="height: 100%;--ion-item-background: var(--ion-color-primary)">
         <InvitationItem v-for="invitation in Array(10)" :key="invitation" skeleton/>
       </ion-list>
 
-      <ion-list style="height: 100%;"
+      <ion-list style="height: 100%;--ion-item-background: var(--ion-color-primary)"
                 v-else>
         <RecycleScroller class="ion-content-scroll-host scroller"
                          :items="invitations"
@@ -99,7 +102,7 @@
                   Angpao
                 </div>
                 <ion-toggle
-                    color="secondary"
+                    color="medium"
                     :checked="invitationModal.hasGift"
                     @ionChange="invitationModal.hasGift = ! invitationModal.hasGift"/>
               </div>
@@ -190,6 +193,10 @@
 
 .scan-region-highlight-svg {
   stroke: var(--ion-color-secondary) !important;
+}
+
+.ion-color .searchbar-input {
+  background: var(--ion-color-secondary-tint) !important
 }
 </style>
 
