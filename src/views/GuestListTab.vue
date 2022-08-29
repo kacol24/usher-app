@@ -171,7 +171,9 @@
 
 <style lang="scss">
 .scanner__container {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: fixed;
   top: 0;
   left: 0;
@@ -184,6 +186,13 @@
   .scan-region-highlight-svg {
     stroke: var(--ion-color-secondary-tint) !important;
   }
+}
+
+.scanner__view {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
 }
 
 .scroller {
