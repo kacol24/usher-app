@@ -1,10 +1,10 @@
 <template>
   <ion-page ref="pageRef">
-    <ion-header>
-      <ion-toolbar>
+    <ion-header style="background-color: var(--ion-color-primary)">
+      <ion-toolbar color="secondary">
         <ion-title>Guest List</ion-title>
       </ion-toolbar>
-      <ion-toolbar>
+      <ion-toolbar color="secondary">
         <ion-buttons slot="start">
           <ion-skeleton-text animated style="width: 100px;" v-if="isLoadingGroups"></ion-skeleton-text>
           <ion-select placeholder="Groups" v-else style="max-width: 100px"
@@ -20,7 +20,7 @@
             </ion-select-option>
           </ion-select>
         </ion-buttons>
-        <form>
+        <form action="" @submit.prevent>
           <ion-searchbar animated
                          inputmode="search"
                          show-cancel-button="focus"
@@ -44,7 +44,7 @@
                 v-else>
         <RecycleScroller class="ion-content-scroll-host scroller"
                          :items="invitations"
-                         :item-size="143"
+                         :item-size="150"
                          key-field="guest_code">
           <template v-slot="{ item }">
             <InvitationItem @click="showInvitation(item)" :invitation="item"/>
@@ -59,7 +59,7 @@
           @willDismiss="invitationModal.setOpen(false)">
         <div class="ion-page">
           <ion-header>
-            <ion-toolbar>
+            <ion-toolbar color="secondary">
               <ion-title>
                 Invitation Detail
               </ion-title>
@@ -68,7 +68,7 @@
               </ion-buttons>
             </ion-toolbar>
           </ion-header>
-          <ion-content>
+          <ion-content color="primary">
             <div class="ion-padding">
               <h1 style="text-align: center;">
                 {{ invitationModal.invitation.name }}
@@ -99,13 +99,14 @@
                   Angpao
                 </div>
                 <ion-toggle
+                    color="secondary"
                     :checked="invitationModal.hasGift"
                     @ionChange="invitationModal.hasGift = ! invitationModal.hasGift"/>
               </div>
             </div>
           </ion-content>
           <ion-footer>
-            <ion-toolbar style="min-height: 110px;">
+            <ion-toolbar style="min-height: 110px;" color="secondary">
               <div style="text-align: center;"
                    v-if="invitationModal.serialNumber">
                 <h1 class="ion-margin-vertical" style="font-size: 39px">
@@ -118,7 +119,7 @@
                 </h1>
               </div>
             </ion-toolbar>
-            <ion-toolbar>
+            <ion-toolbar color="secondary">
               <ion-button expand="block" :color="checkInButton[confirmCheckIn].color"
                           class="ion-padding-horizontal btn-progress"
                           :class="{ 'btn-progress--start': confirmCheckIn === 1 }"
@@ -149,6 +150,7 @@
           horizontal="center"
           slot="fixed">
         <ion-fab-button
+            color="secondary"
             :disabled="state.isLoading"
             :activated="scanner.isStarted"
             @click="scanner.startScan()">
@@ -184,6 +186,10 @@
   background-color: var(--ion-color-success-shade);
   transition: transform 3s linear;
   transform: scaleX(0);
+}
+
+.scan-region-highlight-svg {
+  stroke: var(--ion-color-secondary) !important;
 }
 </style>
 

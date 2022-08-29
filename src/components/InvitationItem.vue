@@ -25,7 +25,10 @@
       </div>
     </ion-label>
   </ion-item>
-  <ion-item button :detail="false" v-else>
+  <ion-item button
+            color="primary"
+            :detail="false"
+            v-else>
     <ion-thumbnail slot="start">
       {{ invitation.attendance?.serial_number ?? '-' }}
     </ion-thumbnail>
