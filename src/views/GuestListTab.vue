@@ -124,6 +124,7 @@
             </ion-toolbar>
             <ion-toolbar color="secondary">
               <ion-button expand="block" :color="checkInButton[confirmCheckIn].color"
+                          shape="round"
                           class="ion-padding-horizontal btn-progress"
                           :class="{ 'btn-progress--start': confirmCheckIn === 1 }"
                           ref="btnProgress" mode="ios"
