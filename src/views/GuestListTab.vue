@@ -6,27 +6,18 @@
       </ion-toolbar>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-select placeholder="Select fruit" interface="popover">
-            <ion-select-option value="bananas_1">Bananas 1</ion-select-option>
-            <ion-select-option value="bananas_2">Bananas 2</ion-select-option>
-            <ion-select-option value="bananas_3">Bananas 3</ion-select-option>
-            <ion-select-option value="bananas_4">Bananas 4</ion-select-option>
-            <ion-select-option value="bananas_5">Bananas 5</ion-select-option>
-            <ion-select-option value="bananas_6">Bananas 6</ion-select-option>
-            <ion-select-option value="bananas_7">Bananas 7</ion-select-option>
-            <ion-select-option value="bananas_8">Bananas 8</ion-select-option>
-            <ion-select-option value="bananas_9">Bananas 9</ion-select-option>
-            <ion-select-option value="bananas_10">Bananas 10</ion-select-option>
-            <ion-select-option value="bananas_11">Bananas 11</ion-select-option>
-            <ion-select-option value="bananas_12">Bananas 12</ion-select-option>
-            <ion-select-option value="bananas_13">Bananas 13</ion-select-option>
-            <ion-select-option value="bananas_14">Bananas 14</ion-select-option>
-            <ion-select-option value="bananas_15">Bananas 15</ion-select-option>
-            <ion-select-option value="bananas_16">Bananas 16</ion-select-option>
-            <ion-select-option value="bananas_17">Bananas 17</ion-select-option>
-            <ion-select-option value="bananas_18">Bananas 18</ion-select-option>
-            <ion-select-option value="bananas_19">Bananas 19</ion-select-option>
-            <ion-select-option value="bananas_20">Bananas 20</ion-select-option>
+          <ion-skeleton-text animated style="width: 100px;" v-if="isLoadingGroups"></ion-skeleton-text>
+          <ion-select placeholder="Groups" v-else style="max-width: 100px"
+                      :interface-options="{ header: 'Filter By Group'}"
+                      :value="selectedGroup"
+                      @ionChange="filterGroup.handleOnChange"
+                      @ionCancel="filterGroup.handleOnCancel"
+                      cancel-text="Show All">
+            <ion-select-option v-for="group in groupResponse.groups"
+                               :key="group.id"
+                               :value="group.id">
+              {{ group.group_name }}
+            </ion-select-option>
           </ion-select>
         </ion-buttons>
         <form>
@@ -97,16 +88,16 @@
               </ion-buttons>
             </ion-toolbar>
           </ion-header>
-          <ion-content :scroll-y="false">
+          <ion-content>
             <div class="ion-padding">
-              <h1 class="ion-padding-vertical ion-margin-vertical" style="text-align: center;">
+              <h1 style="text-align: center;">
                 {{ invitationModal.invitation.name }}
                 <small style="display: block;" class="ion-margin-top">
                   {{ invitationModal.invitation.guest_code }}
                 </small>
               </h1>
               <div style="display: flex; align-items: center; justify-content: space-between;"
-                   class="ion-padding-vertical ion-margin-vertical">
+                   class="ion-margin-vertical">
                 <div>
                   Table<br>
                   <h3>
@@ -222,7 +213,9 @@ import {qrCodeSharp} from 'ionicons/icons';
 import {
   IonButton,
   IonButtons,
-  IonContent, IonFab, IonFabButton,
+  IonContent,
+  IonFab,
+  IonFabButton,
   IonFooter,
   IonHeader,
   IonIcon,
@@ -233,19 +226,21 @@ import {
   IonModal,
   IonNote,
   IonPage,
-  IonPopover,
   IonRefresher,
   IonRefresherContent,
-  IonSearchbar, IonSelect, IonSelectOption,
+  IonSearchbar,
+  IonSelect,
+  IonSelectOption,
   IonSkeletonText,
   IonText,
   IonThumbnail,
-  IonTitle, IonToast,
+  IonTitle,
+  IonToast,
   IonToggle,
   IonToolbar
 } from '@ionic/vue';
-import {useQuery, useMutation} from '@urql/vue';
-import {ALL_INVITATIONS_QUERY} from '@/graphql/queries';
+import {useMutation, useQuery} from '@urql/vue';
+import {ALL_GROUPS_QUERY, ALL_INVITATIONS_QUERY} from '@/graphql/queries';
 import InvitationItem from '@/components/InvitationItem';
 import {CHECKIN_MUTATION} from '@/graphql/mutations';
 import QrScanner from 'qr-scanner';
@@ -288,6 +283,19 @@ export default defineComponent({
     const {state} = inject('store');
 
     const search = ref('');
+
+    const groupResponse = useQuery({
+      query: ALL_GROUPS_QUERY
+    });
+    const selectedGroup = ref('');
+    const filterGroup = reactive({
+      handleOnChange(e) {
+        selectedGroup.value = e.detail.value;
+      },
+      handleOnCancel() {
+        selectedGroup.value = '';
+      }
+    });
 
     const toast = reactive({
       isOpen: false,
@@ -368,11 +376,15 @@ export default defineComponent({
     }
 
     const filteredInvitations = computed(() => {
-      if (!search.value) {
+      if (!search.value && !selectedGroup.value) {
         return state.invitations;
       }
 
-      return state.invitations.filter(invitation => {
+      const invitations = state.invitations.filter(invitation => {
+        return invitation.group?.id == selectedGroup.value;
+      });
+
+      return invitations.filter(invitation => {
         return invitation.name.toLowerCase().includes(search.value.toLowerCase()) ||
             invitation.guest_code.toLowerCase().includes(search.value.toLowerCase());
       });
@@ -431,12 +443,12 @@ export default defineComponent({
         let query = decodedText;
         scanner.stopScan();
 
-        let filteredInvitation = state.invitations.filter(invitation => {
-          return invitation.guest_code.includes(query);
+        let filteredInvitation = state.invitations.find(invitation => {
+          return invitation.guest_code == query;
         });
 
-        if (filteredInvitation.length) {
-          return showInvitation(filteredInvitation[0]);
+        if (filteredInvitation) {
+          return showInvitation(filteredInvitation);
         }
 
         errorToast.message = 'Invitation [' + query + '] not found!';
@@ -474,7 +486,12 @@ export default defineComponent({
 
       toast,
       errorToast,
-      scanner
+      scanner,
+
+      isLoadingGroups: groupResponse.fetching,
+      groupResponse: groupResponse.data,
+      filterGroup,
+      selectedGroup
     };
   }
 });

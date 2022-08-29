@@ -10,6 +10,7 @@ export const ALL_INVITATIONS_QUERY = gql`
             pax
             is_family
             group {
+                id
                 group_name
             }
             seating {
@@ -49,6 +50,15 @@ export const GROUPED_INVITATIONS_QUERY = gql`
                     has_gift
                 }
             }
+        }
+    }
+`;
+
+export const ALL_GROUPS_QUERY = gql`
+    query GetAllGroups {
+        groups {
+            id
+            group_name
         }
     }
 `;
