@@ -73,6 +73,7 @@ ion-thumbnail {
   justify-content: center;
   width: 30px;
   height: 25px;
+  white-space: nowrap;
 }
 
 ion-skeleton-text {
