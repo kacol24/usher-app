@@ -134,7 +134,7 @@
                 </h1>
               </div>
             </ion-toolbar>
-            <ion-toolbar color="secondary">
+            <ion-toolbar color="secondary" class="ion-padding-bottom" style="margin-top: -1px;">
               <ion-button expand="block" :color="checkInButton[confirmCheckIn].color"
                           shape="round"
                           class="ion-padding-horizontal btn-progress"
