@@ -114,7 +114,7 @@
                   Angpao
                 </div>
                 <ion-toggle
-                    color="medium"
+                    color="light"
                     :checked="invitationModal.hasGift"
                     @ionChange="invitationModal.hasGift = ! invitationModal.hasGift"/>
               </div>
