@@ -5,7 +5,9 @@ module.exports = {
     msTileColor: '#09232f',
     appleMobileWebAppCapable: 'yes',
     manifestOptions: {
-      name: 'Usher App - loVINyouforeFER'
+      name: 'Usher App - loVINyouforeFER',
+      theme_color: '#09232f',
+      background_color: '#09232f'
     }
   }
 }
