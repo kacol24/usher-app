@@ -114,9 +114,19 @@
                   Angpao
                 </div>
                 <ion-toggle
-                    color="light"
+                    color="secondary"
                     :checked="invitationModal.hasGift"
                     @ionChange="invitationModal.hasGift = ! invitationModal.hasGift"/>
+              </div>
+              <div class="ion-padding-vertical">
+                <ion-item color="primary">
+                  <ion-label position="floating">
+                    Notes
+                  </ion-label>
+                  <ion-textarea placeholder="Enter more information here..." rows="3" auto-grow
+                                color="light" enterkeyhint="done" inputmode="text" wrap="soft"
+                                v-model="invitationModal.notes"></ion-textarea>
+                </ion-item>
               </div>
             </div>
           </ion-content>
@@ -141,7 +151,10 @@
                           :class="{ 'btn-progress--start': confirmCheckIn === 1 }"
                           ref="btnProgress" mode="ios"
                           @click="handleCheckIn">
-                {{ checkInButton[confirmCheckIn].text }}
+                {{
+                  invitationModal.serialNumber ? checkInButton[confirmCheckIn].text_update :
+                      checkInButton[confirmCheckIn].text
+                }}
               </ion-button>
             </ion-toolbar>
           </ion-footer>
@@ -249,7 +262,7 @@ import {
   IonFabButton,
   IonFooter,
   IonHeader,
-  IonIcon,
+  IonIcon, IonItem, IonLabel,
   IonList,
   IonLoading,
   IonModal,
@@ -260,7 +273,7 @@ import {
   IonSelect,
   IonSelectOption,
   IonSkeletonText,
-  IonText,
+  IonText, IonTextarea,
   IonTitle,
   IonToast,
   IonToggle,
@@ -302,7 +315,10 @@ export default defineComponent({
     IonFabButton,
     RecycleScroller,
     IonSelect,
-    IonSelectOption
+    IonSelectOption,
+    IonItem,
+    IonLabel,
+    IonTextarea
   },
   setup() {
     const {state} = inject('store');
@@ -352,6 +368,7 @@ export default defineComponent({
       serialNumber: null,
       checkinTime: null,
       hasGift: true,
+      notes: null,
 
       setOpen(open) {
         this.isOpen = open;
@@ -363,11 +380,13 @@ export default defineComponent({
     const checkInButton = ref([
       {
         color: 'primary',
-        text: 'CHECK IN'
+        text: 'CHECK IN',
+        text_update: 'UPDATE CHECK IN'
       },
       {
         color: 'success',
-        text: 'CONFIRM CHECK IN'
+        text: 'CONFIRM CHECK IN',
+        text_update: 'CONFIRM CHECK IN'
       }
     ]);
 
@@ -388,13 +407,15 @@ export default defineComponent({
         const payload = {
           guest_code: invitationModal.invitation.guest_code,
           has_gift: invitationModal.hasGift,
-          sequence_group: state.sequenceGroup
+          sequence_group: state.sequenceGroup,
+          notes: invitationModal.notes
         };
         const {data: checkinResponse} = await checkIn(payload);
         invitationModal.isLoading = false;
 
         invitationModal.serialNumber = checkinResponse.checkIn.attendance.serial_number;
         invitationModal.checkinTime = checkinResponse.checkIn.attendance.checkin_time;
+        invitationModal.notes = checkinResponse.checkIn.attendance.notes;
         toast.isOpen = true;
 
         pushInvitations(checkinResponse.checkIn.invitations);
@@ -448,6 +469,7 @@ export default defineComponent({
       invitationModal.hasGift = invitation.attendance?.has_gift ?? true;
       invitationModal.serialNumber = invitation.attendance?.serial_number;
       invitationModal.checkinTime = invitation.attendance?.checkin_time;
+      invitationModal.notes = invitation.attendance?.notes;
       invitationModal.setOpen(true);
     }
 

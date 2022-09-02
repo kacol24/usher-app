@@ -21,6 +21,7 @@ export const ALL_INVITATIONS_QUERY = gql`
                 created_at
                 checkin_time
                 has_gift
+                notes
             }
         }
     }
@@ -48,6 +49,7 @@ export const GROUPED_INVITATIONS_QUERY = gql`
                     created_at
                     checkin_time
                     has_gift
+                    notes
                 }
             }
         }
