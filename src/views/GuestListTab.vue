@@ -121,7 +121,7 @@
             </div>
           </ion-content>
           <ion-footer>
-            <ion-toolbar style="min-height: 110px;" color="secondary">
+            <ion-toolbar style="min-height: 110px;" color="secondary" class="ion-padding-top">
               <div style="text-align: center;"
                    v-if="invitationModal.serialNumber">
                 <h1 class="ion-margin-vertical" style="font-size: 39px">
@@ -134,10 +134,10 @@
                 </h1>
               </div>
             </ion-toolbar>
-            <ion-toolbar color="secondary" class="ion-padding-bottom" style="margin-top: -1px;">
+            <ion-toolbar color="secondary" class="ion-padding-bottom" style="margin-top: -1px; padding-bottom: 16px;">
               <ion-button expand="block" :color="checkInButton[confirmCheckIn].color"
                           shape="round"
-                          class="ion-padding-horizontal btn-progress"
+                          class="ion-padding-horizontal btn-progress ion-margin-bottom"
                           :class="{ 'btn-progress--start': confirmCheckIn === 1 }"
                           ref="btnProgress" mode="ios"
                           @click="handleCheckIn">
