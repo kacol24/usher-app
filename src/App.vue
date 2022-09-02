@@ -20,14 +20,14 @@ export default defineComponent({
   setup() {
     provide('store', store);
 
-    const {executeQuery, data: response} = useQuery({
+    const {executeQuery: fetchInvitations, data: response} = useQuery({
       query: ALL_INVITATIONS_QUERY
     });
 
     store.state.isLoading = true;
     onMounted(async () => {
       if (!store.state.invitations.length) {
-        await executeQuery();
+        await fetchInvitations();
         store.state.invitations = response.value.invitations;
       }
       store.state.isLoading = false;

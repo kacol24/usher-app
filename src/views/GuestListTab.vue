@@ -427,12 +427,12 @@ export default defineComponent({
       state.isLoading = true;
       e.detail.complete();
 
-      await fetchInvitations();
+      await reloadInvitations();
 
       state.isLoading = false;
     }
 
-    async function fetchInvitations() {
+    async function reloadInvitations() {
       await executeQuery({
         requestPolicy: 'network-only'
       });
