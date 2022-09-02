@@ -37,6 +37,7 @@ export const CHECKIN_MUTATION = gql`
                     created_at
                     checkin_time
                     has_gift
+                    notes
                 }
             }
         }
