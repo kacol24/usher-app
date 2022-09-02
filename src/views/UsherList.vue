@@ -44,6 +44,20 @@
           <ion-label>Usher G2</ion-label>
           <ion-radio slot="end" color="secondary" value="G2"></ion-radio>
         </ion-item>
+        <ion-item color="primary" lines="full">
+          <ion-thumbnail slot="start">
+            B
+          </ion-thumbnail>
+          <ion-label>Usher B</ion-label>
+          <ion-radio slot="end" color="secondary" value="B"></ion-radio>
+        </ion-item>
+        <ion-item color="primary" lines="full">
+          <ion-thumbnail slot="start">
+            G
+          </ion-thumbnail>
+          <ion-label>Usher G</ion-label>
+          <ion-radio slot="end" color="secondary" value="G"></ion-radio>
+        </ion-item>
       </ion-radio-group>
     </ion-content>
   </ion-page>
