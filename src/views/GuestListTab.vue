@@ -35,6 +35,7 @@
         </ion-buttons>
         <form action="" @submit.prevent>
           <ion-searchbar animated
+                         placeholder="Search guest code / name"
                          color="dark"
                          inputmode="search"
                          show-cancel-button="focus"
@@ -47,16 +48,15 @@
     </ion-header>
     <ion-content :fullscreen="true"
                  :scroll-y="false">
-      <ion-refresher slot="fixed" @ionRefresh="doRefresh($event)">
-        <ion-refresher-content/>
-      </ion-refresher>
-
       <ion-list v-if="state.isLoading" style="height: 100%;--ion-item-background: var(--ion-color-primary)">
         <InvitationItem v-for="invitation in Array(10)" :key="invitation" skeleton/>
       </ion-list>
 
       <ion-list style="height: 100%;--ion-item-background: var(--ion-color-primary)"
                 v-else>
+        <ion-refresher slot="fixed" @ionRefresh="doRefresh($event)">
+          <ion-refresher-content/>
+        </ion-refresher>
         <RecycleScroller class="ion-content-scroll-host scroller"
                          :items="invitations"
                          :item-size="150"
@@ -447,9 +447,7 @@ export default defineComponent({
     async function doRefresh(e) {
       state.isLoading = true;
       e.detail.complete();
-
       await reloadInvitations();
-
       state.isLoading = false;
     }
 
