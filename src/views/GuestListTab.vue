@@ -114,35 +114,39 @@
                   Angpao
                 </div>
                 <ion-toggle
-                    color="secondary"
+                    color="danger"
                     :checked="invitationModal.hasGift"
                     @ionChange="invitationModal.hasGift = ! invitationModal.hasGift"/>
               </div>
               <div class="ion-padding-vertical">
-                <ion-item color="primary">
-                  <ion-label position="floating">
+                <ion-item color="light">
+                  <ion-label position="stacked">
                     Notes
                   </ion-label>
                   <ion-textarea placeholder="Enter more information here..." rows="3" auto-grow
-                                color="light" enterkeyhint="done" inputmode="text" wrap="soft"
+                                color="dark" enterkeyhint="done" inputmode="text" wrap="soft"
                                 v-model="invitationModal.notes"></ion-textarea>
                 </ion-item>
               </div>
             </div>
           </ion-content>
           <ion-footer>
-            <ion-toolbar style="min-height: 110px;" color="secondary" class="ion-padding-top">
-              <div style="text-align: center;"
-                   v-if="invitationModal.serialNumber">
-                <h1 class="ion-margin-vertical" style="font-size: 39px">
-                  {{ invitationModal.serialNumber }}
-                  <ion-text color="medium">
-                    <small style="display: block; font-size: 16px">
-                      ({{ invitationModal.checkinTime }})
-                    </small>
-                  </ion-text>
-                </h1>
-              </div>
+            <ion-toolbar color="secondary" class="ion-padding-vertical" style="padding-top: 16px;padding-bottom: 16px;">
+              <ion-title size="large" style="text-align: center;"
+                         v-if="invitationModal.serialNumber">
+                {{ invitationModal.serialNumber }}
+                <ion-text color="medium">
+                  <small style="display: block; font-size: 16px">
+                    ({{ invitationModal.checkinTime }})
+                  </small>
+                </ion-text>
+              </ion-title>
+              <ion-buttons slot="end">
+                <ion-button color="danger"
+                            v-if="invitationModal.serialNumber">
+                  <ion-icon :icon="icons.close" slot="icon-only"></ion-icon>
+                </ion-button>
+              </ion-buttons>
             </ion-toolbar>
             <ion-toolbar color="secondary" class="ion-padding-bottom" style="margin-top: -1px; padding-bottom: 16px;">
               <ion-button expand="block" :color="checkInButton[confirmCheckIn].color"
@@ -253,7 +257,7 @@
 
 <script>
 import {computed, defineComponent, inject, onMounted, reactive, ref} from 'vue';
-import {createOutline, qrCodeSharp} from 'ionicons/icons';
+import {createOutline, qrCodeSharp, closeCircle} from 'ionicons/icons';
 import {
   IonButton,
   IonButtons,
@@ -526,7 +530,8 @@ export default defineComponent({
     return {
       icons: {
         qrCode: qrCodeSharp,
-        edit: createOutline
+        edit: createOutline,
+        close: closeCircle
       },
       invitations: filteredInvitations,
       search,
