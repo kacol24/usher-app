@@ -17,6 +17,7 @@ export const ALL_INVITATIONS_QUERY = gql`
                 name
             }
             attendance {
+                id
                 serial_number
                 created_at
                 checkin_time
@@ -45,6 +46,7 @@ export const GROUPED_INVITATIONS_QUERY = gql`
                     name
                 }
                 attendance {
+                    id
                     serial_number
                     created_at
                     checkin_time

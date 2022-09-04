@@ -1,7 +1,7 @@
 import {gql} from "@urql/vue";
 
 export const CHECKIN_MUTATION = gql`
-    mutation (
+    mutation CheckIn (
         $guest_code: String!,
         $sequence_group: String,
         $has_gift: Boolean,
@@ -14,6 +14,7 @@ export const CHECKIN_MUTATION = gql`
             notes: $notes
         ) {
             attendance {
+                id
                 serial_number
                 checkin_time
                 has_gift
@@ -33,6 +34,7 @@ export const CHECKIN_MUTATION = gql`
                     name
                 }
                 attendance {
+                    id
                     serial_number
                     created_at
                     checkin_time
@@ -40,6 +42,22 @@ export const CHECKIN_MUTATION = gql`
                     notes
                 }
             }
+        }
+    }
+`;
+
+export const DELETE_ATTENDANCE_MUTATION = gql`
+    mutation DeleteAttendance (
+        $id: ID!
+    ) {
+        deleteAttendance(
+            id: $id
+        ) {
+            id
+            serial_number
+            checkin_time
+            has_gift
+            notes
         }
     }
 `;

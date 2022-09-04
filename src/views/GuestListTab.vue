@@ -115,8 +115,8 @@
                 </div>
                 <ion-toggle
                     color="danger"
-                    :checked="invitationModal.hasGift"
-                    @ionChange="invitationModal.hasGift = ! invitationModal.hasGift"/>
+                    :checked="invitationModal.attendance.has_gift ?? false"
+                    @ionChange="invitationModal.attendance.has_gift = ! invitationModal.attendance.has_gift"/>
               </div>
               <div class="ion-padding-vertical">
                 <ion-item color="light">
@@ -125,25 +125,29 @@
                   </ion-label>
                   <ion-textarea placeholder="Enter more information here..." rows="3" auto-grow
                                 color="dark" enterkeyhint="done" inputmode="text" wrap="soft"
-                                v-model="invitationModal.notes"></ion-textarea>
+                                v-model="invitationModal.attendance.notes"></ion-textarea>
                 </ion-item>
               </div>
             </div>
           </ion-content>
           <ion-footer>
             <ion-toolbar color="secondary" class="ion-padding-vertical" style="padding-top: 16px;padding-bottom: 16px;">
+              <ion-buttons slot="start">
+                <div style="width: 38px; height: 32px;"></div>
+              </ion-buttons>
               <ion-title size="large" style="text-align: center;"
-                         v-if="invitationModal.serialNumber">
-                {{ invitationModal.serialNumber }}
+                         v-if="invitationModal.attendance.serial_number">
+                {{ invitationModal.attendance.serial_number }}
                 <ion-text color="medium">
                   <small style="display: block; font-size: 16px">
-                    ({{ invitationModal.checkinTime }})
+                    ({{ invitationModal.attendance.checkin_time }})
                   </small>
                 </ion-text>
               </ion-title>
               <ion-buttons slot="end">
                 <ion-button color="danger"
-                            v-if="invitationModal.serialNumber">
+                            @click="confirmDelete(invitationModal.attendance.id)"
+                            v-if="invitationModal.attendance.serial_number">
                   <ion-icon :icon="icons.close" slot="icon-only"></ion-icon>
                 </ion-button>
               </ion-buttons>
@@ -151,12 +155,12 @@
             <ion-toolbar color="secondary" class="ion-padding-bottom" style="margin-top: -1px; padding-bottom: 16px;">
               <ion-button expand="block" :color="checkInButton[confirmCheckIn].color"
                           shape="round"
-                          class="ion-padding-horizontal btn-progress ion-margin-bottom"
+                          class="btn-progress ion-margin-bottom"
                           :class="{ 'btn-progress--start': confirmCheckIn === 1 }"
                           ref="btnProgress" mode="ios"
                           @click="handleCheckIn">
                 {{
-                  invitationModal.serialNumber ? checkInButton[confirmCheckIn].text_update :
+                  invitationModal.attendance?.serial_number ? checkInButton[confirmCheckIn].text_update :
                       checkInButton[confirmCheckIn].text
                 }}
               </ion-button>
@@ -259,6 +263,7 @@
 import {computed, defineComponent, inject, onMounted, reactive, ref} from 'vue';
 import {createOutline, qrCodeSharp, closeCircle} from 'ionicons/icons';
 import {
+  alertController,
   IonButton,
   IonButtons,
   IonContent,
@@ -288,7 +293,7 @@ import {
 import {useMutation, useQuery} from '@urql/vue';
 import {ALL_GROUPS_QUERY, ALL_INVITATIONS_QUERY} from '@/graphql/queries';
 import InvitationItem from '@/components/InvitationItem';
-import {CHECKIN_MUTATION} from '@/graphql/mutations';
+import {CHECKIN_MUTATION, DELETE_ATTENDANCE_MUTATION} from '@/graphql/mutations';
 import QrScanner from 'qr-scanner';
 import {RecycleScroller} from 'vue-virtual-scroller';
 
@@ -369,10 +374,10 @@ export default defineComponent({
       isLoading: false,
 
       invitation: null,
-      serialNumber: null,
-      checkinTime: null,
-      hasGift: true,
-      notes: null,
+      attendance: {
+        has_gift: true,
+        notes: null
+      },
 
       setOpen(open) {
         this.isOpen = open;
@@ -410,16 +415,13 @@ export default defineComponent({
         invitationModal.isLoading = true;
         const payload = {
           guest_code: invitationModal.invitation.guest_code,
-          has_gift: invitationModal.hasGift,
+          has_gift: invitationModal.attendance.has_gift,
           sequence_group: state.sequenceGroup,
-          notes: invitationModal.notes
+          notes: invitationModal.attendance.notes
         };
         const {data: checkinResponse} = await checkIn(payload);
         invitationModal.isLoading = false;
-
-        invitationModal.serialNumber = checkinResponse.checkIn.attendance.serial_number;
-        invitationModal.checkinTime = checkinResponse.checkIn.attendance.checkin_time;
-        invitationModal.notes = checkinResponse.checkIn.attendance.notes;
+        invitationModal.attendance = checkinResponse.checkIn.attendance;
         toast.isOpen = true;
 
         pushInvitations(checkinResponse.checkIn.invitations);
@@ -468,10 +470,9 @@ export default defineComponent({
 
     function showInvitation(invitation) {
       invitationModal.invitation = invitation;
-      invitationModal.hasGift = invitation.attendance?.has_gift ?? true;
-      invitationModal.serialNumber = invitation.attendance?.serial_number;
-      invitationModal.checkinTime = invitation.attendance?.checkin_time;
-      invitationModal.notes = invitation.attendance?.notes;
+      if (invitation.attendance?.serial_number) {
+        invitationModal.attendance = invitation.attendance;
+      }
       invitationModal.setOpen(true);
     }
 
@@ -527,6 +528,42 @@ export default defineComponent({
       );
     });
 
+    const {executeMutation: deleteAttendanceMutation} = useMutation(DELETE_ATTENDANCE_MUTATION);
+
+    async function confirmDelete(id) {
+      const alert = await alertController.create({
+        header: 'Delete attendance?',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+          {
+            text: 'OK',
+            role: 'confirm',
+            handler: () => {
+              handleDeleteAttendance(id);
+            }
+          }
+        ]
+      });
+
+      await alert.present();
+    }
+
+    async function handleDeleteAttendance(id) {
+      invitationModal.isLoading = true;
+      const {data: deleteResponse} = await deleteAttendanceMutation({
+        id: id
+      });
+      invitationModal.attendance = {
+        has_gift: true,
+        notes: null
+      };
+      await reloadInvitations();
+      invitationModal.isLoading = false;
+    }
+
     return {
       icons: {
         qrCode: qrCodeSharp,
@@ -553,7 +590,9 @@ export default defineComponent({
       isLoadingGroups: groupResponse.fetching,
       groupResponse: groupResponse.data,
       filterGroup,
-      selectedGroup
+      selectedGroup,
+
+      confirmDelete
     };
   }
 });
