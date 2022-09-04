@@ -553,7 +553,7 @@ export default defineComponent({
 
     async function handleDeleteAttendance(id) {
       invitationModal.isLoading = true;
-      const {data: deleteResponse} = await deleteAttendanceMutation({
+      await deleteAttendanceMutation({
         id: id
       });
       invitationModal.attendance = {
