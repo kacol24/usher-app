@@ -113,19 +113,53 @@
                 <div class="ion-margin-bottom">
                   Angpao
                 </div>
-                <ion-toggle
-                    color="danger"
-                    :checked="invitationModal.attendance.has_gift ?? false"
-                    @ionChange="invitationModal.attendance.has_gift = ! invitationModal.attendance.has_gift"/>
+                <ion-buttons>
+                  <ion-button fill="solid" class="ion-padding-horizontal ion-color" style="width: 70px;"
+                              @click="invitationModal.attendance.has_gift = false"
+                              :class="{ 'ion-color-danger': invitationModal.attendance.has_gift == false, 'ion-color-light': invitationModal.attendance.has_gift == true || invitationModal.attendance.has_gift == null }">
+                    No
+                  </ion-button>
+                  <ion-button fill="solid" class="ion-padding-horizontal ion-color" style="width: 70px;"
+                              @click="invitationModal.attendance.has_gift = true"
+                              :class="{ 'ion-color-danger': invitationModal.attendance.has_gift == true, 'ion-color-light': invitationModal.attendance.has_gift == false || invitationModal.attendance.has_gift == null }">
+                    Yes
+                  </ion-button>
+                </ion-buttons>
               </div>
               <div class="ion-padding-vertical">
-                <ion-item color="light">
-                  <ion-label position="stacked">
-                    Notes
+                <div class="ion-margin-bottom ion-padding-horizontal">
+                  <ion-label color="light">
+                    Titip Angpao
                   </ion-label>
-                  <ion-textarea placeholder="Enter more information here..." rows="3" auto-grow
-                                color="dark" enterkeyhint="done" inputmode="text" wrap="soft"
-                                v-model="invitationModal.attendance.notes"></ion-textarea>
+                </div>
+                <ion-item color="primary">
+                  <ion-list style="width: 100%;">
+                    <ion-item lines="full">
+                      <ion-label>1</ion-label>
+                      <ion-input placeholder="Nama Tamu" autocapitalize="words"
+                                 enterkeyhint="next" color="dark"/>
+                    </ion-item>
+                    <ion-item lines="full">
+                      <ion-label>2</ion-label>
+                      <ion-input placeholder="Nama Tamu" autocapitalize="words"
+                                 enterkeyhint="next" color="dark"/>
+                    </ion-item>
+                    <ion-item lines="full">
+                      <ion-label>3</ion-label>
+                      <ion-input placeholder="Nama Tamu" autocapitalize="words"
+                                 enterkeyhint="next" color="dark"/>
+                    </ion-item>
+                    <ion-item lines="full">
+                      <ion-label>4</ion-label>
+                      <ion-input placeholder="Nama Tamu" autocapitalize="words"
+                                 enterkeyhint="next" color="dark"/>
+                    </ion-item>
+                    <ion-item lines="full">
+                      <ion-label>5</ion-label>
+                      <ion-input placeholder="Nama Tamu" autocapitalize="words"
+                                 enterkeyhint="next" color="dark"/>
+                    </ion-item>
+                  </ion-list>
                 </ion-item>
               </div>
             </div>
@@ -158,6 +192,7 @@
                           class="btn-progress ion-margin-bottom"
                           :class="{ 'btn-progress--start': confirmCheckIn === 1 }"
                           ref="btnProgress" mode="ios"
+                          :disabled="invitationModal.attendance.has_gift == null"
                           @click="handleCheckIn">
                 {{
                   invitationModal.attendance?.serial_number ? checkInButton[confirmCheckIn].text_update :
@@ -261,7 +296,7 @@
 
 <script>
 import {computed, defineComponent, inject, onMounted, reactive, ref} from 'vue';
-import {createOutline, qrCodeSharp, closeCircle} from 'ionicons/icons';
+import {closeCircle, createOutline, qrCodeSharp} from 'ionicons/icons';
 import {
   alertController,
   IonButton,
@@ -271,7 +306,10 @@ import {
   IonFabButton,
   IonFooter,
   IonHeader,
-  IonIcon, IonItem, IonLabel,
+  IonIcon,
+  IonInput,
+  IonItem,
+  IonLabel,
   IonList,
   IonLoading,
   IonModal,
@@ -282,10 +320,9 @@ import {
   IonSelect,
   IonSelectOption,
   IonSkeletonText,
-  IonText, IonTextarea,
+  IonText,
   IonTitle,
   IonToast,
-  IonToggle,
   IonToolbar,
   onIonViewWillEnter,
   useIonRouter
@@ -318,7 +355,6 @@ export default defineComponent({
     IonText,
     IonLoading,
     InvitationItem,
-    IonToggle,
     IonToast,
     IonFab,
     IonFabButton,
@@ -327,7 +363,7 @@ export default defineComponent({
     IonSelectOption,
     IonItem,
     IonLabel,
-    IonTextarea
+    IonInput
   },
   setup() {
     const {state} = inject('store');
@@ -375,7 +411,7 @@ export default defineComponent({
 
       invitation: null,
       attendance: {
-        has_gift: true,
+        has_gift: null,
         notes: null
       },
 
@@ -470,6 +506,10 @@ export default defineComponent({
 
     function showInvitation(invitation) {
       invitationModal.invitation = invitation;
+      invitationModal.attendance = {
+        has_gift: null,
+        notes: null
+      };
       if (invitation.attendance?.serial_number) {
         invitationModal.attendance = invitation.attendance;
       }
@@ -557,12 +597,14 @@ export default defineComponent({
         id: id
       });
       invitationModal.attendance = {
-        has_gift: true,
+        has_gift: null,
         notes: null
       };
       await reloadInvitations();
       invitationModal.isLoading = false;
     }
+
+    const extraGifts = ref(0);
 
     return {
       icons: {
@@ -592,7 +634,8 @@ export default defineComponent({
       filterGroup,
       selectedGroup,
 
-      confirmDelete
+      confirmDelete,
+      extraGifts
     };
   }
 });

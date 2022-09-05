@@ -18,45 +18,31 @@
                        @ionChange="handleChange">
         <ion-item color="primary" lines="full">
           <ion-thumbnail slot="start">
-            B1
+            S
           </ion-thumbnail>
-          <ion-label>Usher B1</ion-label>
-          <ion-radio slot="end" color="secondary" value="B1"></ion-radio>
+          <ion-label>Sutrisno</ion-label>
+          <ion-radio slot="end" color="light" value="S"></ion-radio>
         </ion-item>
         <ion-item color="primary" lines="full">
           <ion-thumbnail slot="start">
-            B2
+            Z
           </ion-thumbnail>
-          <ion-label>Usher B2</ion-label>
-          <ion-radio slot="end" color="secondary" value="B2"></ion-radio>
+          <ion-label>Zella</ion-label>
+          <ion-radio slot="end" color="light" value="Z"></ion-radio>
         </ion-item>
         <ion-item color="primary" lines="full">
           <ion-thumbnail slot="start">
-            G1
+            P
           </ion-thumbnail>
-          <ion-label>Usher G1</ion-label>
-          <ion-radio slot="end" color="secondary" value="G1"></ion-radio>
+          <ion-label>Peter</ion-label>
+          <ion-radio slot="end" color="light" value="P"></ion-radio>
         </ion-item>
         <ion-item color="primary" lines="full">
           <ion-thumbnail slot="start">
-            G2
+            V
           </ion-thumbnail>
-          <ion-label>Usher G2</ion-label>
-          <ion-radio slot="end" color="secondary" value="G2"></ion-radio>
-        </ion-item>
-        <ion-item color="primary" lines="full">
-          <ion-thumbnail slot="start">
-            B
-          </ion-thumbnail>
-          <ion-label>Usher B</ion-label>
-          <ion-radio slot="end" color="secondary" value="B"></ion-radio>
-        </ion-item>
-        <ion-item color="primary" lines="full">
-          <ion-thumbnail slot="start">
-            G
-          </ion-thumbnail>
-          <ion-label>Usher G</ion-label>
-          <ion-radio slot="end" color="secondary" value="G"></ion-radio>
+          <ion-label>Verly</ion-label>
+          <ion-radio slot="end" color="light" value="V"></ion-radio>
         </ion-item>
       </ion-radio-group>
     </ion-content>
