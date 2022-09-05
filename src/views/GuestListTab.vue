@@ -136,7 +136,8 @@
                     +
                   </ion-button>
                 </div>
-                <ion-list style="width: 100%;">
+                <ion-list style="width: 100%; padding-top: 0;padding-bottom: 0;"
+                          v-if="invitationModal.attendance.notes.length">
                   <ion-item lines="full" v-for="(note, index) in invitationModal.attendance.notes" :key="index">
                     <ion-label slot="start">
                       {{ index + 1 }}
