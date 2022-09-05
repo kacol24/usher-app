@@ -5,7 +5,7 @@ export const CHECKIN_MUTATION = gql`
         $guest_code: String!,
         $sequence_group: String,
         $has_gift: Boolean,
-        $notes: String
+        $notes: [String]
     ) {
         checkIn(
             guest_code: $guest_code,

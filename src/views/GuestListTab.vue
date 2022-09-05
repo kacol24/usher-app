@@ -137,27 +137,32 @@
                     <ion-item lines="full">
                       <ion-label>1</ion-label>
                       <ion-input placeholder="Nama Tamu" autocapitalize="words"
-                                 enterkeyhint="next" color="dark"/>
+                                 enterkeyhint="next" color="dark"
+                                 v-model="invitationModal.attendance.notes[0]"/>
                     </ion-item>
                     <ion-item lines="full">
                       <ion-label>2</ion-label>
                       <ion-input placeholder="Nama Tamu" autocapitalize="words"
-                                 enterkeyhint="next" color="dark"/>
+                                 enterkeyhint="next" color="dark"
+                                 v-model="invitationModal.attendance.notes[1]"/>
                     </ion-item>
                     <ion-item lines="full">
                       <ion-label>3</ion-label>
                       <ion-input placeholder="Nama Tamu" autocapitalize="words"
-                                 enterkeyhint="next" color="dark"/>
+                                 enterkeyhint="next" color="dark"
+                                 v-model="invitationModal.attendance.notes[2]"/>
                     </ion-item>
                     <ion-item lines="full">
                       <ion-label>4</ion-label>
                       <ion-input placeholder="Nama Tamu" autocapitalize="words"
-                                 enterkeyhint="next" color="dark"/>
+                                 enterkeyhint="next" color="dark"
+                                 v-model="invitationModal.attendance.notes[3]"/>
                     </ion-item>
                     <ion-item lines="full">
                       <ion-label>5</ion-label>
                       <ion-input placeholder="Nama Tamu" autocapitalize="words"
-                                 enterkeyhint="next" color="dark"/>
+                                 enterkeyhint="next" color="dark"
+                                 v-model="invitationModal.attendance.notes[4]"/>
                     </ion-item>
                   </ion-list>
                 </ion-item>
@@ -412,7 +417,9 @@ export default defineComponent({
       invitation: null,
       attendance: {
         has_gift: null,
-        notes: null
+        notes: [
+          '', '', '', '', ''
+        ]
       },
 
       setOpen(open) {
@@ -508,10 +515,17 @@ export default defineComponent({
       invitationModal.invitation = invitation;
       invitationModal.attendance = {
         has_gift: null,
-        notes: null
+        notes: [
+          '', '', '', '', ''
+        ]
       };
       if (invitation.attendance?.serial_number) {
         invitationModal.attendance = invitation.attendance;
+      }
+      if (!invitation.attendance?.notes) {
+        invitationModal.attendance.notes = [
+          '', '', '', '', ''
+        ];
       }
       invitationModal.setOpen(true);
     }
@@ -598,7 +612,9 @@ export default defineComponent({
       });
       invitationModal.attendance = {
         has_gift: null,
-        notes: null
+        notes: [
+          '', '', '', '', ''
+        ]
       };
       await reloadInvitations();
       invitationModal.isLoading = false;
