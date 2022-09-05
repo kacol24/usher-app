@@ -127,45 +127,29 @@
                 </ion-buttons>
               </div>
               <div class="ion-padding-vertical">
-                <div class="ion-margin-bottom ion-padding-horizontal">
+                <div style="display: flex;align-items: center;" class="ion-margin-vertical ion-padding-top">
                   <ion-label color="light">
                     Titip Angpao
                   </ion-label>
+                  <ion-button color="success" class="ion-margin-start" size="small"
+                              @click="invitationModal.attendance.notes.push('')">
+                    +
+                  </ion-button>
                 </div>
-                <ion-item color="primary">
-                  <ion-list style="width: 100%;">
-                    <ion-item lines="full">
-                      <ion-label>1</ion-label>
-                      <ion-input placeholder="Nama Tamu" autocapitalize="words"
-                                 enterkeyhint="next" color="dark"
-                                 v-model="invitationModal.attendance.notes[0]"/>
-                    </ion-item>
-                    <ion-item lines="full">
-                      <ion-label>2</ion-label>
-                      <ion-input placeholder="Nama Tamu" autocapitalize="words"
-                                 enterkeyhint="next" color="dark"
-                                 v-model="invitationModal.attendance.notes[1]"/>
-                    </ion-item>
-                    <ion-item lines="full">
-                      <ion-label>3</ion-label>
-                      <ion-input placeholder="Nama Tamu" autocapitalize="words"
-                                 enterkeyhint="next" color="dark"
-                                 v-model="invitationModal.attendance.notes[2]"/>
-                    </ion-item>
-                    <ion-item lines="full">
-                      <ion-label>4</ion-label>
-                      <ion-input placeholder="Nama Tamu" autocapitalize="words"
-                                 enterkeyhint="next" color="dark"
-                                 v-model="invitationModal.attendance.notes[3]"/>
-                    </ion-item>
-                    <ion-item lines="full">
-                      <ion-label>5</ion-label>
-                      <ion-input placeholder="Nama Tamu" autocapitalize="words"
-                                 enterkeyhint="next" color="dark"
-                                 v-model="invitationModal.attendance.notes[4]"/>
-                    </ion-item>
-                  </ion-list>
-                </ion-item>
+                <ion-list style="width: 100%;">
+                  <ion-item lines="full" v-for="(note, index) in invitationModal.attendance.notes" :key="index">
+                    <ion-label slot="start">
+                      {{ index + 1 }}
+                    </ion-label>
+                    <ion-input placeholder="Nama Tamu" autocapitalize="words"
+                               enterkeyhint="next" color="dark"
+                               v-model="invitationModal.attendance.notes[index]" debounce="300"/>
+                    <ion-button slot="end" color="danger" shape="round" style="width: 24px;height: 24px;"
+                                @click="handleDeleteExtraGift(index)">
+                      X
+                    </ion-button>
+                  </ion-item>
+                </ion-list>
               </div>
             </div>
           </ion-content>
@@ -417,9 +401,7 @@ export default defineComponent({
       invitation: null,
       attendance: {
         has_gift: null,
-        notes: [
-          '', '', '', '', ''
-        ]
+        notes: []
       },
 
       setOpen(open) {
@@ -515,17 +497,13 @@ export default defineComponent({
       invitationModal.invitation = invitation;
       invitationModal.attendance = {
         has_gift: null,
-        notes: [
-          '', '', '', '', ''
-        ]
+        notes: []
       };
       if (invitation.attendance?.serial_number) {
         invitationModal.attendance = invitation.attendance;
       }
       if (!invitation.attendance?.notes) {
-        invitationModal.attendance.notes = [
-          '', '', '', '', ''
-        ];
+        invitationModal.attendance.notes = [];
       }
       invitationModal.setOpen(true);
     }
@@ -612,15 +590,32 @@ export default defineComponent({
       });
       invitationModal.attendance = {
         has_gift: null,
-        notes: [
-          '', '', '', '', ''
-        ]
+        notes: []
       };
       await reloadInvitations();
       invitationModal.isLoading = false;
     }
 
-    const extraGifts = ref(0);
+    async function handleDeleteExtraGift(index) {
+      const alert = await alertController.create({
+        header: 'Hapus titipan ' + invitationModal.attendance.notes[index] + '?',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+          {
+            text: 'OK',
+            role: 'confirm',
+            handler: () => {
+              invitationModal.attendance.notes.splice(index, 1);
+            }
+          }
+        ]
+      });
+
+      await alert.present();
+    }
 
     return {
       icons: {
@@ -651,7 +646,8 @@ export default defineComponent({
       selectedGroup,
 
       confirmDelete,
-      extraGifts
+
+      handleDeleteExtraGift
     };
   }
 });
