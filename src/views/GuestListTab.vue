@@ -3,15 +3,15 @@
     <ion-header style="background-color: var(--ion-color-secondary)">
       <ion-toolbar color="secondary">
         <ion-title>
-          Guest List
+          List Undangan
           <small style="display: block;font-weight: normal;">
-            Usher - {{ state.sequenceGroup }}
+            Usher: {{ state.sequenceGroup }} - {{ state.usherList[state.sequenceGroup] }}
           </small>
         </ion-title>
         <ion-buttons slot="end">
           <ion-button color="light" router-link="/set-usher">
             <small>
-              Change Usher
+              Ganti Usher
             </small>
           </ion-button>
         </ion-buttons>
@@ -20,12 +20,12 @@
         <ion-buttons slot="start">
           <ion-skeleton-text animated style="width: 100px;"
                              v-if="isLoadingGroups || state.invitations.isLoading"></ion-skeleton-text>
-          <ion-select placeholder="Groups" v-else style="max-width: 100px"
+          <ion-select placeholder="Group" v-else style="max-width: 100px"
                       :interface-options="{ header: 'Filter By Group', cssClass: 'ion-color-secondary' }"
                       :value="selectedGroup"
                       @ionChange="filterGroup.handleOnChange"
                       @ionCancel="filterGroup.handleOnCancel"
-                      cancel-text="Show All">
+                      cancel-text="Semua">
             <ion-select-option v-for="group in groupResponse.groups"
                                :key="group.id"
                                :value="group.id">
@@ -35,7 +35,7 @@
         </ion-buttons>
         <form action="" @submit.prevent>
           <ion-searchbar animated
-                         placeholder="Search guest code / name"
+                         placeholder="nama / kode tamu / serial"
                          color="dark"
                          inputmode="search"
                          show-cancel-button="focus"
@@ -76,7 +76,7 @@
           <ion-header>
             <ion-toolbar color="secondary">
               <ion-title>
-                Invitation Detail
+                {{ invitationModal.invitation.guest_code }}
               </ion-title>
               <ion-buttons slot="end">
                 <ion-button @click="invitationModal.setOpen(false)">Close</ion-button>
@@ -85,14 +85,10 @@
           </ion-header>
           <ion-content color="primary">
             <div class="ion-padding">
-              <h1 style="text-align: center;">
+              <h1 style="text-align: center; margin-top: 0 !important;">
                 {{ invitationModal.invitation.name }}
-                <small style="display: block;" class="ion-margin-top">
-                  {{ invitationModal.invitation.guest_code }}
-                </small>
               </h1>
-              <div style="display: flex; align-items: center; justify-content: space-between;"
-                   class="ion-margin-vertical">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
                 <div>
                   Table<br>
                   <h3>
@@ -115,11 +111,13 @@
                 </div>
                 <ion-buttons>
                   <ion-button fill="solid" class="ion-padding-horizontal ion-color" style="width: 70px;"
+                              :disabled="invitationModal.attendance.sequence_group !== state.sequenceGroup"
                               @click="invitationModal.attendance.has_gift = false"
                               :class="{ 'ion-color-danger': invitationModal.attendance.has_gift == false, 'ion-color-light': invitationModal.attendance.has_gift == true || invitationModal.attendance.has_gift == null }">
                     No
                   </ion-button>
                   <ion-button fill="solid" class="ion-padding-horizontal ion-color" style="width: 70px;"
+                              :disabled="invitationModal.attendance.sequence_group !== state.sequenceGroup"
                               @click="invitationModal.attendance.has_gift = true"
                               :class="{ 'ion-color-danger': invitationModal.attendance.has_gift == true, 'ion-color-light': invitationModal.attendance.has_gift == false || invitationModal.attendance.has_gift == null }">
                     Yes
@@ -127,14 +125,10 @@
                 </ion-buttons>
               </div>
               <div class="ion-padding-vertical">
-                <div style="display: flex;align-items: center;" class="ion-margin-vertical ion-padding-top">
+                <div style="display: flex;align-items: center;" class="ion-margin-bottom">
                   <ion-label color="light">
                     Titip Angpao
                   </ion-label>
-                  <ion-button color="success" class="ion-margin-start" size="small"
-                              @click="invitationModal.attendance.notes.push('')">
-                    +
-                  </ion-button>
                 </div>
                 <ion-list style="width: 100%; padding-top: 0;padding-bottom: 0;"
                           v-if="invitationModal.attendance.notes.length">
@@ -144,13 +138,21 @@
                     </ion-label>
                     <ion-input placeholder="Nama Tamu" autocapitalize="words"
                                enterkeyhint="next" color="dark"
+                               :disabled="invitationModal.attendance.sequence_group !== state.sequenceGroup"
                                v-model="invitationModal.attendance.notes[index]" debounce="300"/>
                     <ion-button slot="end" color="danger" shape="round" style="width: 24px;height: 24px;"
+                                :disabled="invitationModal.attendance.sequence_group !== state.sequenceGroup"
                                 @click="handleDeleteExtraGift(index)">
-                      X
+                      <ion-icon :icon="icons.close" slot="icon-only"></ion-icon>
                     </ion-button>
                   </ion-item>
                 </ion-list>
+                <ion-button color="success" class="ion-margin-top"
+                            size="small"
+                            :disabled="invitationModal.attendance.sequence_group !== state.sequenceGroup"
+                            @click="invitationModal.attendance.notes.push('')">
+                  <ion-icon :icon="icons.add" slot="icon-only"></ion-icon>
+                </ion-button>
               </div>
             </div>
           </ion-content>
@@ -169,10 +171,11 @@
                 </ion-text>
               </ion-title>
               <ion-buttons slot="end">
-                <ion-button color="danger"
+                <ion-button color="danger" fill="solid"
                             @click="confirmDelete(invitationModal.attendance.id)"
-                            v-if="invitationModal.attendance.serial_number">
-                  <ion-icon :icon="icons.close" slot="icon-only"></ion-icon>
+                            v-if="invitationModal.attendance.serial_number"
+                            :disabled="invitationModal.attendance.sequence_group !== state.sequenceGroup">
+                  Hapus
                 </ion-button>
               </ion-buttons>
             </ion-toolbar>
@@ -182,7 +185,7 @@
                           class="btn-progress ion-margin-bottom"
                           :class="{ 'btn-progress--start': confirmCheckIn === 1 }"
                           ref="btnProgress" mode="ios"
-                          :disabled="invitationModal.attendance.has_gift == null"
+                          :disabled="invitationModal.attendance.has_gift == null || (invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
                           @click="handleCheckIn">
                 {{
                   invitationModal.attendance?.serial_number ? checkInButton[confirmCheckIn].text_update :
@@ -198,7 +201,7 @@
       <ion-toast
           :is-open="toast.isOpen"
           duration="2000"
-          message="Check-in success!"
+          message="Success!"
           color="success"
           @didDismiss="toast.setOpen(false)"/>
       <ion-toast
@@ -221,7 +224,7 @@
       </ion-fab>
     </ion-content>
     <div v-show="scanner.isStarted"
-         class="scanner__container">
+         class="scanner__container" style="background-color: var(--ion-color-primary);">
       <video id="scannerView" class="scanner__view"></video>
     </div>
   </ion-page>
@@ -286,7 +289,7 @@
 
 <script>
 import {computed, defineComponent, inject, onMounted, reactive, ref} from 'vue';
-import {closeCircle, createOutline, qrCodeSharp} from 'ionicons/icons';
+import {add, close, createOutline, qrCodeSharp} from 'ionicons/icons';
 import {
   alertController,
   IonButton,
@@ -468,7 +471,8 @@ export default defineComponent({
 
       return invitations.filter(invitation => {
         return invitation.name.toLowerCase().includes(search.value.toLowerCase()) ||
-            invitation.guest_code.toLowerCase().includes(search.value.toLowerCase());
+            invitation.guest_code.toLowerCase().includes(search.value.toLowerCase()) ||
+            invitation.attendance?.serial_number.toLowerCase().includes(search.value.toLowerCase());
       });
     });
 
@@ -622,7 +626,8 @@ export default defineComponent({
       icons: {
         qrCode: qrCodeSharp,
         edit: createOutline,
-        close: closeCircle
+        close: close,
+        add: add
       },
       invitations: filteredInvitations,
       search,
