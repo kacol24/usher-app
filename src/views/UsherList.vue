@@ -16,33 +16,12 @@
     <ion-content style="--background: var(--ion-color-primary)">
       <ion-radio-group :value="sequenceGroup"
                        @ionChange="handleChange">
-        <ion-item color="primary" lines="full">
+        <ion-item color="primary" lines="full" v-for="(name, code) in usherList" :key="code">
           <ion-thumbnail slot="start">
-            S
+            {{ code }}
           </ion-thumbnail>
-          <ion-label>Sutrisno</ion-label>
-          <ion-radio slot="end" color="light" value="S"></ion-radio>
-        </ion-item>
-        <ion-item color="primary" lines="full">
-          <ion-thumbnail slot="start">
-            Z
-          </ion-thumbnail>
-          <ion-label>Zella</ion-label>
-          <ion-radio slot="end" color="light" value="Z"></ion-radio>
-        </ion-item>
-        <ion-item color="primary" lines="full">
-          <ion-thumbnail slot="start">
-            P
-          </ion-thumbnail>
-          <ion-label>Peter</ion-label>
-          <ion-radio slot="end" color="light" value="P"></ion-radio>
-        </ion-item>
-        <ion-item color="primary" lines="full">
-          <ion-thumbnail slot="start">
-            V
-          </ion-thumbnail>
-          <ion-label>Verly</ion-label>
-          <ion-radio slot="end" color="light" value="V"></ion-radio>
+          <ion-label>{{ name }}</ion-label>
+          <ion-radio slot="end" color="light" :value="code"></ion-radio>
         </ion-item>
       </ion-radio-group>
     </ion-content>
@@ -63,6 +42,7 @@ ion-item {
 
 <script>
 import {
+  alertController,
   IonButton,
   IonButtons,
   IonContent,
@@ -104,15 +84,33 @@ export default {
       sequenceGroup.value = e.detail.value;
     }
 
-    function handleSave() {
-      state.sequenceGroup = sequenceGroup.value;
-      router.replace('/');
+    async function handleSave() {
+      const alert = await alertController.create({
+        header: 'Login as ' + state.usherList[sequenceGroup.value] + '?',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel'
+          },
+          {
+            text: 'OK',
+            role: 'confirm',
+            handler: () => {
+              state.sequenceGroup = sequenceGroup.value;
+              router.replace('/');
+            }
+          }
+        ]
+      });
+
+      await alert.present();
     }
 
     return {
       sequenceGroup,
       handleChange,
-      handleSave
+      handleSave,
+      usherList: state.usherList
     };
   }
 };
