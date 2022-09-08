@@ -1,5 +1,5 @@
 <template>
-  <ion-page ref="pageRef">
+  <ion-page>
     <ion-header style="background-color: var(--ion-color-secondary)">
       <ion-toolbar color="secondary">
         <ion-title>
@@ -69,8 +69,6 @@
 
       <ion-modal
           :is-open="invitationModal.isOpen"
-          :can-dismiss="true"
-          :presenting-element="invitationModal.presentingElement"
           @willDismiss="invitationModal.setOpen(false)">
         <div class="ion-page">
           <ion-header>
@@ -111,13 +109,13 @@
                 </div>
                 <ion-buttons>
                   <ion-button fill="solid" class="ion-padding-horizontal ion-color" style="width: 70px;"
-                              :disabled="invitationModal.attendance.sequence_group !== state.sequenceGroup"
+                              :disabled="(invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
                               @click="invitationModal.attendance.has_gift = false"
                               :class="{ 'ion-color-danger': invitationModal.attendance.has_gift == false, 'ion-color-light': invitationModal.attendance.has_gift == true || invitationModal.attendance.has_gift == null }">
                     No
                   </ion-button>
                   <ion-button fill="solid" class="ion-padding-horizontal ion-color" style="width: 70px;"
-                              :disabled="invitationModal.attendance.sequence_group !== state.sequenceGroup"
+                              :disabled="(invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
                               @click="invitationModal.attendance.has_gift = true"
                               :class="{ 'ion-color-danger': invitationModal.attendance.has_gift == true, 'ion-color-light': invitationModal.attendance.has_gift == false || invitationModal.attendance.has_gift == null }">
                     Yes
@@ -138,10 +136,10 @@
                     </ion-label>
                     <ion-input placeholder="Nama Tamu" autocapitalize="words"
                                enterkeyhint="next" color="dark"
-                               :disabled="invitationModal.attendance.sequence_group !== state.sequenceGroup"
+                               :disabled="(invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
                                v-model="invitationModal.attendance.notes[index]" debounce="300"/>
                     <ion-button slot="end" color="danger" shape="round" style="width: 24px;height: 24px;"
-                                :disabled="invitationModal.attendance.sequence_group !== state.sequenceGroup"
+                                :disabled="(invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
                                 @click="handleDeleteExtraGift(index)">
                       <ion-icon :icon="icons.close" slot="icon-only"></ion-icon>
                     </ion-button>
@@ -149,7 +147,7 @@
                 </ion-list>
                 <ion-button color="success" class="ion-margin-top"
                             size="small"
-                            :disabled="invitationModal.attendance.sequence_group !== state.sequenceGroup"
+                            :disabled="invitationModal.attendance.has_gift == null || (invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
                             @click="invitationModal.attendance.notes.push('')">
                   <ion-icon :icon="icons.add" slot="icon-only"></ion-icon>
                 </ion-button>
@@ -395,7 +393,6 @@ export default defineComponent({
 
     const {executeMutation: checkIn} = useMutation(CHECKIN_MUTATION);
 
-    const pageRef = ref();
     const invitationModal = reactive({
       presentingElement: null,
 
@@ -555,7 +552,6 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      invitationModal.presentingElement = pageRef.value.$el;
       qrScanner = new QrScanner(
           document.getElementById('scannerView'),
           result => scanner.onScanSuccess(result.data),
@@ -640,7 +636,6 @@ export default defineComponent({
       confirmCheckIn,
       btnProgress,
       handleCheckIn,
-      pageRef,
 
       toast,
       errorToast,
