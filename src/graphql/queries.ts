@@ -18,6 +18,7 @@ export const ALL_INVITATIONS_QUERY = gql`
             }
             attendance {
                 id
+                sequence_group
                 serial_number
                 created_at
                 checkin_time
