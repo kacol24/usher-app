@@ -3,6 +3,7 @@ import {gql} from "@urql/vue";
 export const ALL_INVITATIONS_QUERY = gql`
     query GetAllInvitations {
         invitations {
+            __typename
             guest_code
             name
             full_name
@@ -10,13 +11,16 @@ export const ALL_INVITATIONS_QUERY = gql`
             pax
             is_family
             group {
+                __typename
                 id
                 group_name
             }
             seating {
+                __typename
                 name
             }
             attendance {
+                __typename
                 id
                 sequence_group
                 serial_number
