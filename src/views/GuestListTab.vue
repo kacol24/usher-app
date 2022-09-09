@@ -108,16 +108,17 @@
                   Angpao
                 </div>
                 <ion-buttons>
-                  <ion-button fill="solid" class="ion-padding-horizontal ion-color" style="width: 70px;"
+                  <ion-button fill="solid" class="ion-color" style="width: 60px;"
                               :disabled="(invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
                               @click="invitationModal.attendance.has_gift = false"
-                              :class="{ 'ion-color-danger': invitationModal.attendance.has_gift == false, 'ion-color-light': invitationModal.attendance.has_gift == true || invitationModal.attendance.has_gift == null }">
+                              :class="{ 'ion-color-success': invitationModal.attendance.has_gift == false, 'ion-color-light': invitationModal.attendance.has_gift == true || invitationModal.attendance.has_gift == null }">
                     No
                   </ion-button>
-                  <ion-button fill="solid" class="ion-padding-horizontal ion-color" style="width: 70px;"
+                  <div style="width: 60px;"></div>
+                  <ion-button fill="solid" class="ion-color" style="width: 60px;"
                               :disabled="(invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
                               @click="invitationModal.attendance.has_gift = true"
-                              :class="{ 'ion-color-danger': invitationModal.attendance.has_gift == true, 'ion-color-light': invitationModal.attendance.has_gift == false || invitationModal.attendance.has_gift == null }">
+                              :class="{ 'ion-color-success': invitationModal.attendance.has_gift == true, 'ion-color-light': invitationModal.attendance.has_gift == false || invitationModal.attendance.has_gift == null }">
                     Yes
                   </ion-button>
                 </ion-buttons>
@@ -145,19 +146,20 @@
                     </ion-button>
                   </ion-item>
                 </ion-list>
-                <ion-button color="success" class="ion-margin-top"
-                            size="small"
-                            :disabled="invitationModal.attendance.has_gift == null || (invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
-                            @click="invitationModal.attendance.notes.push('')">
-                  <ion-icon :icon="icons.add" slot="icon-only"></ion-icon>
-                </ion-button>
+                <ion-buttons class="ion-margin-top">
+                  <ion-button size="small" style="width: 60px;" fill="solid"
+                              :disabled="invitationModal.attendance.has_gift == null || (invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
+                              @click="invitationModal.attendance.notes.push('')">
+                    <ion-icon :icon="icons.add" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </ion-buttons>
               </div>
             </div>
           </ion-content>
           <ion-footer>
             <ion-toolbar color="secondary" class="ion-padding-vertical" style="padding-top: 16px;padding-bottom: 16px;">
               <ion-buttons slot="start">
-                <div style="width: 38px; height: 32px;"></div>
+                <div style="width: 60px"></div>
               </ion-buttons>
               <ion-title size="large" style="text-align: center;"
                          v-if="invitationModal.attendance.serial_number">
@@ -169,7 +171,7 @@
                 </ion-text>
               </ion-title>
               <ion-buttons slot="end">
-                <ion-button color="danger" fill="solid"
+                <ion-button color="danger" fill="solid" style="width: 60px;"
                             @click="confirmDelete(invitationModal.attendance.id)"
                             v-if="invitationModal.attendance.serial_number"
                             :disabled="invitationModal.attendance.sequence_group !== state.sequenceGroup">
