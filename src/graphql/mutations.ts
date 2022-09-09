@@ -16,6 +16,7 @@ export const CHECKIN_MUTATION = gql`
             attendance {
                 id
                 serial_number
+                sequence_group
                 checkin_time
                 has_gift
                 notes
@@ -36,6 +37,7 @@ export const CHECKIN_MUTATION = gql`
                 attendance {
                     id
                     serial_number
+                    sequence_group
                     created_at
                     checkin_time
                     has_gift
@@ -55,6 +57,7 @@ export const DELETE_ATTENDANCE_MUTATION = gql`
         ) {
             id
             serial_number
+            sequence_group
             checkin_time
             has_gift
             notes
