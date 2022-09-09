@@ -7,6 +7,7 @@
         </ion-title>
         <ion-buttons slot="end">
           <ion-button color="light"
+                      :disabled="!sequenceGroup"
                       @click="handleSave">
             Save
           </ion-button>
