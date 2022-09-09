@@ -14,35 +14,13 @@ export const CHECKIN_MUTATION = gql`
             notes: $notes
         ) {
             attendance {
+                __typename
                 id
                 serial_number
                 sequence_group
                 checkin_time
                 has_gift
                 notes
-            }
-            invitations {
-                guest_code
-                name
-                full_name
-                guests
-                pax
-                is_family
-                group {
-                    group_name
-                }
-                seating {
-                    name
-                }
-                attendance {
-                    id
-                    serial_number
-                    sequence_group
-                    created_at
-                    checkin_time
-                    has_gift
-                    notes
-                }
             }
         }
     }
