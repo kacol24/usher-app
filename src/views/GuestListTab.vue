@@ -108,16 +108,16 @@
                   Angpao
                 </div>
                 <ion-buttons>
-                  <ion-button fill="solid" class="ion-color" style="width: 60px;"
+                  <ion-button fill="solid" class="ion-color" style="width: 70px;"
                               :disabled="(invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
-                              @click="invitationModal.attendance.has_gift = false"
+                              @click="setNoAngpao()"
                               :class="{ 'ion-color-success': invitationModal.attendance.has_gift == false, 'ion-color-light': invitationModal.attendance.has_gift == true || invitationModal.attendance.has_gift == null }">
                     No
                   </ion-button>
-                  <div style="width: 60px;"></div>
-                  <ion-button fill="solid" class="ion-color" style="width: 60px;"
+                  <div style="width: 70px;"></div>
+                  <ion-button fill="solid" class="ion-color" style="width: 70px;"
                               :disabled="(invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
-                              @click="invitationModal.attendance.has_gift = true"
+                              @click="setYesAngpao()"
                               :class="{ 'ion-color-success': invitationModal.attendance.has_gift == true, 'ion-color-light': invitationModal.attendance.has_gift == false || invitationModal.attendance.has_gift == null }">
                     Yes
                   </ion-button>
@@ -135,19 +135,32 @@
                     <ion-label slot="start">
                       {{ index + 1 }}
                     </ion-label>
-                    <ion-input placeholder="Nama Tamu" autocapitalize="words"
-                               enterkeyhint="next" color="dark"
+                    <ion-input placeholder="Nama Tamu"
+                               autocapitalize="words"
+                               enterkeyhint="done"
+                               color="dark"
                                :disabled="(invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
-                               v-model="invitationModal.attendance.notes[index]" debounce="300"/>
+                               @ionBlur="focusExtraGift = false; handleBlurExtraGift(index);"
+                               @ionFocus="focusExtraGift = true;"
+                               @keyup.enter="doneEditing($event)"
+                               v-model="invitationModal.attendance.notes[index]"/>
+                    <ion-button slot="end" color="success" shape="round" style="width: 24px;height: 24px;"
+                                :disabled="(invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
+                                @click="handleBlurExtraGift(index)"
+                                v-if="focusExtraGift">
+                      <ion-icon :icon="icons.check" slot="icon-only"></ion-icon>
+                    </ion-button>
                     <ion-button slot="end" color="danger" shape="round" style="width: 24px;height: 24px;"
                                 :disabled="(invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
-                                @click="handleDeleteExtraGift(index)">
+                                @click="handleDeleteExtraGift(index)"
+                                v-else>
                       <ion-icon :icon="icons.close" slot="icon-only"></ion-icon>
                     </ion-button>
                   </ion-item>
                 </ion-list>
-                <ion-buttons class="ion-margin-top">
-                  <ion-button size="small" style="width: 60px;" fill="solid"
+                <ion-buttons class="ion-margin-top"
+                             v-if="!invitationModal.attendance.notes.includes('') && !focusExtraGift">
+                  <ion-button size="small" style="width: 70px;" fill="solid"
                               :disabled="invitationModal.attendance.has_gift == null || (invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
                               @click="invitationModal.attendance.notes.push('')">
                     <ion-icon :icon="icons.add" slot="icon-only"></ion-icon>
@@ -159,7 +172,13 @@
           <ion-footer>
             <ion-toolbar color="secondary" class="ion-padding-vertical" style="padding-top: 16px;padding-bottom: 16px;">
               <ion-buttons slot="start">
-                <div style="width: 60px"></div>
+                <div style="width: 70px;"></div>
+                <!--                <ion-button color="primary" fill="solid" style="width: 70px;"-->
+                <!--                            @click="performCheckIn()"-->
+                <!--                            v-if="invitationModal.attendance.serial_number"-->
+                <!--                            :disabled="invitationModal.attendance.has_gift == null || (invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)">-->
+                <!--                  Update-->
+                <!--                </ion-button>-->
               </ion-buttons>
               <ion-title size="large" style="text-align: center;"
                          v-if="invitationModal.attendance.serial_number">
@@ -171,7 +190,7 @@
                 </ion-text>
               </ion-title>
               <ion-buttons slot="end">
-                <ion-button color="danger" fill="solid" style="width: 60px;"
+                <ion-button color="danger" fill="solid" style="width: 70px;"
                             @click="confirmDelete(invitationModal.attendance.id)"
                             v-if="invitationModal.attendance.serial_number"
                             :disabled="invitationModal.attendance.sequence_group !== state.sequenceGroup">
@@ -179,7 +198,8 @@
                 </ion-button>
               </ion-buttons>
             </ion-toolbar>
-            <ion-toolbar color="secondary" class="ion-padding-bottom" style="margin-top: -1px; padding-bottom: 16px;">
+            <ion-toolbar color="secondary" class="ion-padding-bottom" style="margin-top: -1px; padding-bottom: 16px;"
+                         v-if="!invitationModal.attendance.serial_number">
               <ion-button expand="block" :color="checkInButton[confirmCheckIn].color"
                           shape="round"
                           class="btn-progress ion-margin-bottom"
@@ -198,18 +218,6 @@
       </ion-modal>
       <ion-loading
           :is-open="invitationModal.isLoading"/>
-      <ion-toast
-          :is-open="toast.isOpen"
-          duration="2000"
-          message="Success!"
-          color="success"
-          @didDismiss="toast.setOpen(false)"/>
-      <ion-toast
-          :is-open="errorToast.isOpen"
-          duration="2000"
-          :message="errorToast.message"
-          color="danger"
-          @didDismiss="errorToast.setOpen(false)"/>
       <ion-fab
           vertical="bottom"
           horizontal="center"
@@ -289,7 +297,7 @@
 
 <script>
 import {computed, defineComponent, inject, onMounted, reactive, ref} from 'vue';
-import {add, close, createOutline, qrCodeSharp} from 'ionicons/icons';
+import {add, close, createOutline, qrCodeSharp, checkmark} from 'ionicons/icons';
 import {
   alertController,
   IonButton,
@@ -315,9 +323,9 @@ import {
   IonSkeletonText,
   IonText,
   IonTitle,
-  IonToast,
   IonToolbar,
   onIonViewWillEnter,
+  toastController,
   useIonRouter
 } from '@ionic/vue';
 import {useMutation, useQuery} from '@urql/vue';
@@ -346,9 +354,7 @@ export default defineComponent({
     IonFooter,
     IonModal,
     IonText,
-    IonLoading,
     InvitationItem,
-    IonToast,
     IonFab,
     IonFabButton,
     RecycleScroller,
@@ -356,7 +362,8 @@ export default defineComponent({
     IonSelectOption,
     IonItem,
     IonLabel,
-    IonInput
+    IonInput,
+    IonLoading
   },
   setup() {
     const {state} = inject('store');
@@ -376,28 +383,9 @@ export default defineComponent({
       }
     });
 
-    const toast = reactive({
-      isOpen: false,
-
-      setOpen(open) {
-        this.isOpen = open;
-      }
-    });
-
-    const errorToast = reactive({
-      isOpen: false,
-      message: 'Whoops! Something went wrong',
-
-      setOpen(open) {
-        this.isOpen = open;
-      }
-    });
-
     const {executeMutation: checkIn} = useMutation(CHECKIN_MUTATION);
 
     const invitationModal = reactive({
-      presentingElement: null,
-
       isOpen: false,
       isLoading: false,
 
@@ -429,6 +417,22 @@ export default defineComponent({
 
     let confirmTimer;
 
+    async function setNoAngpao() {
+      invitationModal.attendance.has_gift = false;
+
+      if (invitationModal.attendance.serial_number) {
+        performCheckIn();
+      }
+    }
+
+    async function setYesAngpao() {
+      invitationModal.attendance.has_gift = true;
+
+      if (invitationModal.attendance.serial_number) {
+        performCheckIn();
+      }
+    }
+
     async function handleCheckIn() {
       confirmCheckIn.value++;
 
@@ -440,20 +444,32 @@ export default defineComponent({
         clearTimeout(confirmTimer);
         confirmCheckIn.value = 0;
 
-        invitationModal.isLoading = true;
-        const payload = {
-          guest_code: invitationModal.invitation.guest_code,
-          has_gift: invitationModal.attendance.has_gift,
-          sequence_group: state.sequenceGroup,
-          notes: invitationModal.attendance.notes
-        };
-        const {data: checkinResponse} = await checkIn(payload);
-        invitationModal.isLoading = false;
-        invitationModal.attendance = checkinResponse.checkIn.attendance;
-        toast.isOpen = true;
-
-        pushInvitations(checkinResponse.checkIn.invitations);
+        await performCheckIn();
       }
+    }
+
+    async function performCheckIn() {
+      const toast = await toastController.create({
+        message: 'Success!',
+        duration: 2000,
+        position: 'bottom',
+        color: 'success'
+      });
+
+      invitationModal.isLoading = true;
+      const payload = {
+        guest_code: invitationModal.invitation.guest_code,
+        has_gift: invitationModal.attendance.has_gift,
+        sequence_group: state.sequenceGroup,
+        notes: invitationModal.attendance.notes
+      };
+      const {data: checkinResponse} = await checkIn(payload);
+      reloadInvitations();
+      invitationModal.isLoading = false;
+
+      await toast.present();
+
+      invitationModal.attendance = checkinResponse.checkIn.attendance;
     }
 
     const filteredInvitations = computed(() => {
@@ -529,7 +545,7 @@ export default defineComponent({
         qrScanner.stop();
       },
 
-      onScanSuccess(decodedText) {
+      async onScanSuccess(decodedText) {
         let query = decodedText;
         scanner.stopScan();
 
@@ -541,8 +557,14 @@ export default defineComponent({
           return showInvitation(filteredInvitation);
         }
 
-        errorToast.message = 'Invitation [' + query + '] not found!';
-        errorToast.isOpen = true;
+        const toast = await toastController.create({
+          message: 'Invitation [' + query + '] not found!',
+          duration: 2000,
+          position: 'bottom',
+          color: 'danger'
+        });
+
+        await toast.present();
       }
     });
 
@@ -595,13 +617,23 @@ export default defineComponent({
         has_gift: null,
         notes: []
       };
-      await reloadInvitations();
+      reloadInvitations();
       invitationModal.isLoading = false;
+    }
+
+    const focusExtraGift = ref(false);
+
+    async function handleBlurExtraGift(index) {
+      if (invitationModal.attendance.notes[index] === '') {
+        return handleDeleteExtraGift(index);
+      }
+
+      return performCheckIn();
     }
 
     async function handleDeleteExtraGift(index) {
       const alert = await alertController.create({
-        header: 'Hapus titipan ' + invitationModal.attendance.notes[index] + '?',
+        header: 'Hapus titipan ' + (index + 1) + ' ' + invitationModal.attendance.notes[index] + '?',
         buttons: [
           {
             text: 'Cancel',
@@ -612,6 +644,9 @@ export default defineComponent({
             role: 'confirm',
             handler: () => {
               invitationModal.attendance.notes.splice(index, 1);
+              if (invitationModal.attendance.serial_number) {
+                performCheckIn();
+              }
             }
           }
         ]
@@ -625,7 +660,8 @@ export default defineComponent({
         qrCode: qrCodeSharp,
         edit: createOutline,
         close: close,
-        add: add
+        add: add,
+        check: checkmark
       },
       invitations: filteredInvitations,
       search,
@@ -638,9 +674,10 @@ export default defineComponent({
       confirmCheckIn,
       btnProgress,
       handleCheckIn,
+      performCheckIn,
+      setNoAngpao,
+      setYesAngpao,
 
-      toast,
-      errorToast,
       scanner,
 
       isLoadingGroups: groupResponse.fetching,
@@ -650,7 +687,12 @@ export default defineComponent({
 
       confirmDelete,
 
-      handleDeleteExtraGift
+      handleDeleteExtraGift,
+      handleBlurExtraGift,
+      focusExtraGift,
+      doneEditing(event) {
+        event.target.blur();
+      }
     };
   }
 });
