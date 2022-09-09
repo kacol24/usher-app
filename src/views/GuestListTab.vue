@@ -158,19 +158,26 @@
                     </ion-button>
                   </ion-item>
                 </ion-list>
-                <ion-buttons class="ion-margin-top"
-                             v-if="!invitationModal.attendance.notes.includes('') && !focusExtraGift">
+                <ion-buttons class="ion-margin-top">
                   <ion-button size="small" style="width: 70px;" fill="solid"
-                              :disabled="invitationModal.attendance.has_gift == null || (invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
-                              @click="invitationModal.attendance.notes.push('')">
+                              :disabled="invitationModal.attendance.sequence_group !== state.sequenceGroup"
+                              @click="invitationModal.attendance.notes.push('')"
+                              v-if="!invitationModal.attendance.notes.includes('') && !focusExtraGift">
                     <ion-icon :icon="icons.add" slot="icon-only"></ion-icon>
                   </ion-button>
                 </ion-buttons>
+                <ion-label color="medium" style="margin-top: 16px !important;display: block;"
+                           v-if="!invitationModal.attendance.serial_number">
+                  CHECK IN dulu baru tambahin Titipan Angpao
+                </ion-label>
               </div>
             </div>
           </ion-content>
           <ion-footer>
-            <ion-toolbar color="secondary" class="ion-padding-vertical" style="padding-top: 16px;padding-bottom: 16px;">
+            <ion-toolbar color="secondary"
+                         class="ion-padding-vertical"
+                         style="padding-top: 20px !important;padding-bottom: 20px !important;height: 110px;"
+                         v-if="invitationModal.attendance.serial_number">
               <ion-buttons slot="start">
                 <div style="width: 70px;"></div>
                 <!--                <ion-button color="primary" fill="solid" style="width: 70px;"-->
@@ -198,11 +205,13 @@
                 </ion-button>
               </ion-buttons>
             </ion-toolbar>
-            <ion-toolbar color="secondary" class="ion-padding-bottom" style="margin-top: -1px; padding-bottom: 16px;"
-                         v-if="!invitationModal.attendance.serial_number">
+            <ion-toolbar color="secondary"
+                         class=""
+                         style="padding-top: 26px !important;padding-bottom: 26px !important; height: 110px;"
+                         v-else>
               <ion-button expand="block" :color="checkInButton[confirmCheckIn].color"
                           shape="round"
-                          class="btn-progress ion-margin-bottom"
+                          class="btn-progress"
                           :class="{ 'btn-progress--start': confirmCheckIn === 1 }"
                           ref="btnProgress" mode="ios"
                           :disabled="invitationModal.attendance.has_gift == null || (invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
