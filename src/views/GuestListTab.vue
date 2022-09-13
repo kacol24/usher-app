@@ -141,7 +141,7 @@
                                color="dark"
                                :disabled="(invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
                                @ionBlur="focusExtraGift = false; handleBlurExtraGift(index);"
-                               @ionFocus="focusExtraGift = true;"
+                               @ionChange="focusExtraGift = true;"
                                @keyup.enter="doneEditing($event)"
                                v-model="invitationModal.attendance.notes[index]"/>
                     <ion-button slot="end" color="success" shape="round" style="width: 24px;height: 24px;"
@@ -150,11 +150,11 @@
                                 v-if="focusExtraGift">
                       <ion-icon :icon="icons.check" slot="icon-only"></ion-icon>
                     </ion-button>
-                    <ion-button slot="end" color="danger" shape="round" style="width: 24px;height: 24px;"
+                    <ion-button slot="end" color="danger"
                                 :disabled="(invitationModal.attendance.sequence_group && invitationModal.attendance.sequence_group !== state.sequenceGroup)"
                                 @click="handleDeleteExtraGift(index)"
                                 v-else>
-                      <ion-icon :icon="icons.close" slot="icon-only"></ion-icon>
+                      Hapus
                     </ion-button>
                   </ion-item>
                 </ion-list>
