@@ -21,7 +21,7 @@
           <ion-skeleton-text animated style="width: 100px;"
                              v-if="isLoadingGroups || state.invitations.isLoading"></ion-skeleton-text>
           <ion-select placeholder="Group" v-else style="max-width: 100px"
-                      :interface-options="{ header: 'Filter By Group', cssClass: 'ion-color-secondary' }"
+                      :interface-options="{ header: 'Filter By Group', cssClass: 'ion-color-secondary group-filter-alert' }"
                       :value="selectedGroup"
                       @ionChange="filterGroup.handleOnChange"
                       @ionCancel="filterGroup.handleOnCancel"
@@ -301,6 +301,11 @@
 
 .ion-color .searchbar-input {
   background: var(--ion-color-secondary-tint) !important
+}
+
+.group-filter-alert {
+  --max-width: calc(100% - 32px);
+  --width: 100%;
 }
 </style>
 
