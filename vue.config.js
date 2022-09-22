@@ -5,7 +5,7 @@ module.exports = {
     msTileColor: '#021e2a',
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'black-translucent',
-    assetsVersion: '1.0.1',
+    assetsVersion: '1.0.2',
     manifestOptions: {
       name: process.env.VUE_APP_NAME + ' - loVINyouforeFER',
       theme_color: '#4d1c32',
